@@ -1,52 +1,9 @@
 ================================================================================
 GRADE INFEASIBILITY ANALYSIS REPORT
 ================================================================================
-Generated: 2025-08-03 16:40:17
+Generated: 2025-08-03 16:54:00
 Report Date: Sunday, August 03, 2025
-Generation Time: 04:40:17 PM
+Generation Time: 04:54:00 PM
 ================================================================================
 
-ENHANCED INFEASIBILITY ANALYSIS FOR Super Premium
-======================================================================
-1. CONFIRMED: Model is infeasible as stated
-
-2. CRITICAL CONSTRAINT IDENTIFICATION
-   (Testing which individual constraints cause infeasibility)
-
-   ✗ CRITICAL: OXY <= 2.700
-       Without this constraint, OXY = 11.704
-
-3. MULTIPLE FEASIBILITY PATHS
-   (Different ways to achieve feasibility)
-
-PATH 1: RELAX OXY <= 2.700
-------------------------------------------------------------
-   SOLUTION: Change OXY from <= 2.7000 to <= 3.5945
-             (Increase maximum by 0.8945)
-   RESULT: 400000 bbl, Profit: $42977894.19
-   ACHIEVED PROPERTIES:
-           SPG: 0.7593 (spec: 0.720-0.780)
-           SUL: 2.7153 (spec: <= 10.000)
-           RON: 99.7660 (spec: >= 99.000)
-           MON: 88.6498 (spec: >= 87.000)
-           RVP: 0.7000 (spec: <= 0.700)
-           E70: 37.6167 (spec: 22.000-48.000)
-           E10: 45.6310 (spec: 44.000-70.000)
-           E15: 84.2840 (spec: >= 76.000)
-           ARO: 35.0000 (spec: <= 35.000)
-           BEN: 0.5410 (spec: <= 1.000)
-           OXY: 3.5945 (spec: <= 2.700)
-           OLEFIN: 15.0000 (spec: <= 15.000)
-
-
-5. FEASIBILITY SUMMARY & RECOMMENDATIONS
-==================================================
-SINGLE CONSTRAINT SOLUTIONS (ordered by relaxation size):
-1. OXY <= 2.700 - Relax by 0.8945 (Profit: $42977894.19)
-
-RECOMMENDED SOLUTION:
-► OXY <= 2.700
-  Requires smallest relaxation (0.8945) with profit $42977894.19
-
-================================================================================
-
+All grades were successfully optimized. No infeasibility issues found.
