@@ -439,15 +439,15 @@ def run_optimization(grades_data, components_data, properties_list, specs_data, 
         for comp in components:
             model += blend[g][comp] >= 0, f"{g}_{comp}_NonNegative"
 
-    solver_used = ""
-    if solver_choice == "GLPK":
-        solver_used = "GLPK"
-        try:
-            solver = GLPK_CMD(msg=0, path=GLPSOL_PATH)
-            model.solve(solver)
-        except FileNotFoundError as e:
-            solver_used = "CBC (Fallback)"
-            model.solve(PULP_CBC_CMD(msg=0))
+solver_used = ""
+if solver_choice == "GLPK":
+    solver_used = "GLPK"
+    try:
+        solver = GLPK_CMD(msg=0)  # removed path=GLPSOL_PATH
+        model.solve(solver)
+    except FileNotFoundError as e:
+        solver_used = "CBC (Fallback)"
+        model.solve(PULP_CBC_CMD(msg=0))
     else: 
         solver_used = "CBC"
         model.solve(PULP_CBC_CMD(msg=0))
