@@ -250,45 +250,28 @@ def analyze_grade_infeasibility(grade_name, grade_idx, grades_data, components_d
     diagnostics.append("1. CONFIRMED: Model is infeasible as stated")
     diagnostics.append("")
     
-    # Get all active constraints including RON/MON/RVP properly
+    # Get all active constraints
     active_constraints = []
     constraint_details = {}
     
-    # For RON, MON, RVP we need to check the original specs, not just the converted ones
-    for prop in ['RON', 'MON', 'RVP']:
-        if prop in original_specs_data:
-            min_val = original_specs_data.get(prop, {}).get(grade_name, {}).get('min', 0)
-            max_val = original_specs_data.get(prop, {}).get(grade_name, {}).get('max', float('inf'))
-            
-            # Map to internal property name
-            internal_prop = {'RON': 'ROI', 'MON': 'MOI', 'RVP': 'RVI'}[prop]
-            
-            if min_val is not None and not math.isinf(min_val) and min_val > 0:
-                constraint_key = (internal_prop, 'min')
-                active_constraints.append(constraint_key)
-                constraint_details[constraint_key] = f"{prop} >= {min_val:.3f}"
-            
-            if max_val is not None and not math.isinf(max_val):
-                constraint_key = (internal_prop, 'max')
-                active_constraints.append(constraint_key)
-                constraint_details[constraint_key] = f"{prop} <= {max_val:.3f}"
-    
-    # Handle other properties
     for prop in properties_list:
-        if prop in ['ROI', 'MOI', 'RVI']:
-            continue  # Already handled above
-        
         min_val, max_val = spec_bounds.get((prop, grade_name), (0.0, float('inf')))
         
         if min_val is not None and not math.isinf(min_val) and min_val > 0:
             constraint_key = (prop, 'min')
             active_constraints.append(constraint_key)
-            constraint_details[constraint_key] = f"{prop} >= {min_val:.3f}"
+            
+            # Convert back for display
+            display_prop, display_val = get_display_property_info(prop, min_val)
+            constraint_details[constraint_key] = f"{display_prop} >= {display_val:.3f}"
         
         if max_val is not None and not math.isinf(max_val):
             constraint_key = (prop, 'max')
             active_constraints.append(constraint_key)
-            constraint_details[constraint_key] = f"{prop} <= {max_val:.3f}"
+            
+            # Convert back for display
+            display_prop, display_val = get_display_property_info(prop, max_val)
+            constraint_details[constraint_key] = f"{display_prop} <= {display_val:.3f}"
     
     # Step 2: Find which single constraint relaxations make it feasible
     diagnostics.append("2. CRITICAL CONSTRAINT IDENTIFICATION")
@@ -446,28 +429,16 @@ def analyze_grade_infeasibility(grade_name, grade_idx, grades_data, components_d
         max_relax = 50.0
         best_relax = None
         
-        # For RON/MON/RVP (actually ROI/MOI/RVI internally), we need different search ranges
+        # Adjust search range based on property type
         if prop in ['ROI', 'MOI', 'RVI']:
-            # These are in transformed space, need to adjust search range based on the transformation
-            if prop == 'ROI':
-                # For RON values around 90-100, small changes in RON mean larger changes in ROI
-                min_relax = 0.1
-                max_relax = 20.0
-            elif prop == 'MOI':
-                min_relax = 0.1
-                max_relax = 20.0
-            elif prop == 'RVI':
-                min_relax = 0.01
-                max_relax = 5.0
+            min_relax = 0.01
+            max_relax = 10.0
         elif prop in ['E70', 'E10', 'E15', 'ARO', 'OLEFIN']:
             min_relax = 0.1
             max_relax = 20.0
         elif prop in ['SPG']:
             min_relax = 0.001
             max_relax = 0.1
-        elif prop in ['OXY']:
-            min_relax = 0.01
-            max_relax = 5.0
         
         for iteration in range(25):  # Increased iterations for precision
             test_relax = (min_relax + max_relax) / 2
@@ -492,45 +463,15 @@ def analyze_grade_infeasibility(grade_name, grade_idx, grades_data, components_d
             if bound_type == 'max':
                 _, current_val = spec_bounds.get((prop, grade_name), (0.0, float('inf')))
             
-            # For RON/MON/RVP, we need to display in original units
-            if prop in ['ROI', 'MOI', 'RVI']:
-                # Get original spec value
-                display_prop_map = {'ROI': 'RON', 'MOI': 'MON', 'RVI': 'RVP'}
-                display_prop = display_prop_map[prop]
-                
-                if bound_type == 'min':
-                    current_display = original_specs_data.get(display_prop, {}).get(grade_name, {}).get('min', 0)
-                    # Calculate what the new RON value would be
-                    new_internal = current_val - best_relax
-                    if prop == 'ROI':
-                        new_display = reverse_roi_to_ron(new_internal)
-                    elif prop == 'MOI':
-                        new_display = reverse_moi_to_mon(new_internal)
-                    elif prop == 'RVI':
-                        new_display = reverse_rvi_to_rvp(new_internal)
-                else:
-                    current_display = original_specs_data.get(display_prop, {}).get(grade_name, {}).get('max', float('inf'))
-                    # Calculate what the new RON value would be
-                    new_internal = current_val + best_relax
-                    if prop == 'ROI':
-                        new_display = reverse_roi_to_ron(new_internal)
-                    elif prop == 'MOI':
-                        new_display = reverse_moi_to_mon(new_internal)
-                    elif prop == 'RVI':
-                        new_display = reverse_rvi_to_rvp(new_internal)
-            else:
-                # For other properties, display as-is
-                display_prop = prop
-                current_display = current_val
-                if bound_type == 'min':
-                    new_display = current_val - best_relax
-                else:
-                    new_display = current_val + best_relax
+            # Convert for display
+            display_prop, current_display = get_display_property_info(prop, current_val)
             
             if bound_type == 'min':
+                _, new_display = get_display_property_info(prop, current_val - best_relax)
                 diagnostics.append(f"   SOLUTION: Change {display_prop} from >= {current_display:.4f} to >= {new_display:.4f}")
                 diagnostics.append(f"             (Reduce minimum by {current_display - new_display:.4f})")
             else:
+                _, new_display = get_display_property_info(prop, current_val + best_relax)
                 diagnostics.append(f"   SOLUTION: Change {display_prop} from <= {current_display:.4f} to <= {new_display:.4f}")
                 diagnostics.append(f"             (Increase maximum by {new_display - current_display:.4f})")
             
@@ -568,63 +509,9 @@ def analyze_grade_infeasibility(grade_name, grade_idx, grades_data, components_d
         
         diagnostics.append("")
     
-    # Step 4: Test RON-specific relaxations to find all feasible RON values
-    if 'ROI' in [c[0] for c in critical_constraints if c[1] == 'min']:
-        diagnostics.append("4. RON RELAXATION ANALYSIS")
-        diagnostics.append("   (Testing specific RON values for feasibility)")
-        diagnostics.append("")
-        
-        current_ron_min = original_specs_data.get('RON', {}).get(grade_name, {}).get('min', 0)
-        
-        # Test decreasing RON values
-        ron_solutions = []
-        for test_ron in range(int(current_ron_min) - 1, max(85, int(current_ron_min) - 10), -1):
-            # Convert test RON to ROI
-            test_roi = calculate_roi(test_ron)
-            current_roi_min = spec_bounds.get(('ROI', grade_name), (0, float('inf')))[0]
-            relax_amount = current_roi_min - test_roi
-            
-            if relax_amount > 0:
-                test_model, test_blend, test_total = create_test_model(
-                    relaxed_constraints=[('ROI', 'min', relax_amount)]
-                )
-                test_model.solve(PULP_CBC_CMD(msg=0))
-                
-                if test_model.status == LpStatusOptimal:
-                    total_vol = sum(test_blend[comp].varValue or 0 for comp in components)
-                    profit = value(test_model.objective)
-                    achieved_props = calculate_achieved_properties(test_blend, total_vol)
-                    
-                    ron_solutions.append({
-                        'ron': test_ron,
-                        'profit': profit,
-                        'volume': total_vol,
-                        'achieved_props': achieved_props
-                    })
-        
-        if ron_solutions:
-            diagnostics.append("   FEASIBLE RON VALUES:")
-            for sol in ron_solutions[:5]:  # Show top 5
-                diagnostics.append(f"   • RON >= {sol['ron']}: {sol['volume']:.0f} bbl, Profit: ${sol['profit']:.2f}")
-                # Check if all other specs are met
-                all_specs_met = True
-                for prop_name, achieved_val in sol['achieved_props'].items():
-                    if prop_name == 'RON':
-                        continue
-                    spec_min = original_specs_data.get(prop_name, {}).get(grade_name, {}).get('min', 0)
-                    spec_max = original_specs_data.get(prop_name, {}).get(grade_name, {}).get('max', float('inf'))
-                    if (spec_min > 0 and achieved_val < spec_min) or (not math.isinf(spec_max) and achieved_val > spec_max):
-                        all_specs_met = False
-                        break
-                if all_specs_met:
-                    diagnostics.append("     ✓ All other specifications met")
-                else:
-                    diagnostics.append("     ⚠ Some other specifications not met")
-            diagnostics.append("")
-    
-    # Step 5: Test combinations of smaller relaxations
+    # Step 4: Test combinations of smaller relaxations
     if len(critical_constraints) > 1:
-        diagnostics.append("5. COMBINATION SOLUTIONS")
+        diagnostics.append("4. COMBINATION SOLUTIONS")
         diagnostics.append("   (Smaller relaxations across multiple constraints)")
         diagnostics.append("")
         
@@ -687,47 +574,20 @@ def analyze_grade_infeasibility(grade_name, grade_idx, grades_data, components_d
                 if bound_type == 'max':
                     _, current_val = spec_bounds.get((prop, grade_name), (0.0, float('inf')))
                 
-                # Handle display for RON/MON/RVP
-                if prop in ['ROI', 'MOI', 'RVI']:
-                    display_prop_map = {'ROI': 'RON', 'MOI': 'MON', 'RVI': 'RVP'}
-                    display_prop = display_prop_map[prop]
-                    
-                    if bound_type == 'min':
-                        current_display = original_specs_data.get(display_prop, {}).get(grade_name, {}).get('min', 0)
-                        new_internal = current_val - relax_amount
-                        if prop == 'ROI':
-                            new_display = reverse_roi_to_ron(new_internal)
-                        elif prop == 'MOI':
-                            new_display = reverse_moi_to_mon(new_internal)
-                        elif prop == 'RVI':
-                            new_display = reverse_rvi_to_rvp(new_internal)
-                    else:
-                        current_display = original_specs_data.get(display_prop, {}).get(grade_name, {}).get('max', float('inf'))
-                        new_internal = current_val + relax_amount
-                        if prop == 'ROI':
-                            new_display = reverse_roi_to_ron(new_internal)
-                        elif prop == 'MOI':
-                            new_display = reverse_moi_to_mon(new_internal)
-                        elif prop == 'RVI':
-                            new_display = reverse_rvi_to_rvp(new_internal)
-                else:
-                    display_prop = prop
-                    current_display = current_val
-                    if bound_type == 'min':
-                        new_display = current_val - relax_amount
-                    else:
-                        new_display = current_val + relax_amount
+                display_prop, current_display = get_display_property_info(prop, current_val)
                 
                 if bound_type == 'min':
+                    _, new_display = get_display_property_info(prop, current_val - relax_amount)
                     diagnostics.append(f"   - Relax {display_prop} from >= {current_display:.4f} to >= {new_display:.4f}")
                 else:
+                    _, new_display = get_display_property_info(prop, current_val + relax_amount)
                     diagnostics.append(f"   - Relax {display_prop} from <= {current_display:.4f} to <= {new_display:.4f}")
             
             diagnostics.append(f"   - Result: {combo['total_volume']:.0f} bbl, Profit: ${combo['profit']:.2f}")
             diagnostics.append("")
     
     diagnostics.append("")
-    diagnostics.append("6. FEASIBILITY SUMMARY & RECOMMENDATIONS")
+    diagnostics.append("5. FEASIBILITY SUMMARY & RECOMMENDATIONS")
     diagnostics.append("=" * 50)
     
     if solution_paths:
@@ -759,13 +619,6 @@ def analyze_grade_infeasibility(grade_name, grade_idx, grades_data, components_d
         for constraint_key, relax_amount in zip(best_combo['constraints'], best_combo['relaxations']):
             desc = constraint_details[constraint_key]
             diagnostics.append(f"  - {desc}: relax by {relax_amount:.4f}")
-    
-    if 'ron_solutions' in locals() and ron_solutions:
-        diagnostics.append("")
-        diagnostics.append("RON-SPECIFIC RECOMMENDATIONS:")
-        best_ron = ron_solutions[0]
-        diagnostics.append(f"► Relax RON from >= {current_ron_min:.0f} to >= {best_ron['ron']:.0f}")
-        diagnostics.append(f"  Result: {best_ron['volume']:.0f} bbl, Profit: ${best_ron['profit']:.2f}")
     
     return diagnostics
 
@@ -1215,7 +1068,7 @@ end;
         
         # --- End MathProg File Generation ---
 
-        glpsol_range_command = ["glpsol", "--math", mod_file_path, "--data", dat_file_path, "--ranges", "result2.txt"]
+        glpsol_range_command = ["glpsol", "--math", mod_file_path, "--data", dat_file_path, "--ranges", "temp_range_output.txt"]
         try:
             subprocess.run(glpsol_range_command, capture_output=True, text=True, check=True)
             with open("temp_range_output.txt", 'r', encoding='utf-8') as temp_f:
@@ -1391,6 +1244,6 @@ def download_file(filename):
 
 # Main application entry point
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 10000))  # use Render's PORT if available
-    app.run(host="0.0.0.0", port=port, debug=False)
-
+    app.run(debug=True)
+            
+    
