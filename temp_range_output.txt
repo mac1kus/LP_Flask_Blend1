@@ -1,688 +1,688 @@
 GLPK 4.65 - SENSITIVITY ANALYSIS REPORT                                                                         Page   1
 
 Problem:    model
-Objective:  Total_Profit = 17909285.15 (MAXimum)
+Objective:  Total_Profit = 61268203.45 (MAXimum)
 
    No. Row name     St      Activity         Slack   Lower bound       Activity      Obj coef  Obj value at Limiting
                                           Marginal   Upper bound          range         range   break point variable
 ------ ------------ -- ------------- ------------- -------------  ------------- ------------- ------------- ------------
-     1 Total_Profit BS   1.79093e+07  -1.79093e+07          -Inf    1.50282e+07      -1.00000        .      Property_Min[RON,Regular]
-                                            .               +Inf    1.79093e+07          +Inf          +Inf
+     1 Total_Profit BS   6.12682e+07  -6.12682e+07          -Inf     6.1138e+07      -1.00000        .      blend[Super_Premium,C4B]
+                                            .               +Inf    6.12682e+07          +Inf          +Inf
 
      2 Min_Volume[Regular]
-                    BS  400000.00000 -396000.00000    4000.00000         .          -20.15989   9.84533e+06 Max_Volume[Regular]
+                    BS  400000.00000 -400000.00000        .              .          -19.75670   5.33655e+07 Max_Volume[Regular]
                                             .               +Inf   400000.00000          +Inf          +Inf
 
      3 Min_Volume[Premium]
-                    BS  400000.00000 -400000.00000        .              .          -23.52613   8.49883e+06 Max_Volume[Premium]
+                    BS  400000.00000 -400000.00000        .              .          -25.25561    5.1166e+07 Max_Volume[Premium]
                                             .               +Inf   400000.00000          +Inf          +Inf
 
      4 Min_Volume[Super_Premium]
-                    BS    4000.00000   -4000.00000        .              .         -108.71904   1.74744e+07 Max_Volume[Super_Premium]
-                                            .               +Inf     4000.00000          +Inf          +Inf
+                    BS  400000.00000 -396000.00000    4000.00000         .         -108.15821   1.80049e+07 Max_Volume[Super_Premium]
+                                            .               +Inf   400000.00000          +Inf          +Inf
 
      5 Max_Volume[Regular]
-                    NU  400000.00000        .               -Inf     4000.00000     -20.15989   9.92597e+06 Min_Volume[Regular]
-                                          20.15989  400000.00000     1.9692e+06          +Inf   4.95442e+07 Component_Availability[RCG]
+                    NU  400000.00000        .               -Inf         .          -19.75670   5.33655e+07 Property_Min[E10,Regular]
+                                          19.75670  400000.00000    1.96928e+06          +Inf    9.2272e+07 Component_Availability[RCG]
 
      6 Max_Volume[Premium]
-                    NU  400000.00000        .               -Inf         .          -23.52613   8.49883e+06 Property_Min[E10,Premium]
-                                          23.52613  400000.00000    1.98064e+06          +Inf   5.50957e+07 Component_Availability[RCG]
+                    NU  400000.00000        .               -Inf         .          -25.25561    5.1166e+07 Property_Min[E10,Premium]
+                                          25.25561  400000.00000    1.98072e+06          +Inf    1.0119e+08 Component_Availability[RCG]
 
      7 Max_Volume[Super_Premium]
-                    NU    4000.00000        .               -Inf         .         -108.71904   1.74744e+07 blend[Super_Premium,RCG]
-                                         108.71904    4000.00000    1.67583e+06          +Inf   1.99669e+08 Component_Availability[RFL]
+                    NU  400000.00000        .               -Inf     4000.00000    -108.15821   1.84376e+07 Min_Volume[Super_Premium]
+                                         108.15821  400000.00000    1.61857e+06          +Inf   1.93067e+08 Component_Availability[RFL]
 
      8 Component_Availability[C4B]
-                    BS        .              1e+06          -Inf         .               -Inf   1.79093e+07
-                                            .              1e+06       33.09543      35.67113   1.79093e+07 blend[Super_Premium,C4B]
+                    BS        .              1e+06          -Inf         .               -Inf   6.12682e+07
+                                            .              1e+06     3548.23042      36.69681   6.12682e+07 blend[Super_Premium,C4B]
 
      9 Component_Availability[IS1]
-                    BS      90.61370  999909.38630          -Inf       81.63631    -131.50271   1.78974e+07 blend[Super_Premium,C4B]
-                                            .              1e+06     8606.88642      35.94682   1.79125e+07 blend[Regular,IS1]
+                    BS   23616.12844  976383.87156          -Inf    22997.27188    -210.40210   5.62993e+07 blend[Super_Premium,C4B]
+                                            .              1e+06    29844.94571      30.19624   6.19813e+07 blend[Super_Premium,RCG]
 
     10 Component_Availability[RFL]
-                    BS   85520.62119  914479.37881          -Inf    81243.71032     -71.57804   1.17879e+07 blend[Regular,IS1]
-                                            .              1e+06   113523.96131       2.58323   1.81302e+07 Property_Max[SUL,Premium]
+                    BS  309869.86176  690130.13824          -Inf   294361.58593     -12.12816   5.75101e+07 blend[Super_Premium,RCG]
+                                            .              1e+06   420857.71840       2.53157   6.20527e+07 Property_Max[SUL,Regular]
 
 GLPK 4.65 - SENSITIVITY ANALYSIS REPORT                                                                         Page   2
 
 Problem:    model
-Objective:  Total_Profit = 17909285.15 (MAXimum)
+Objective:  Total_Profit = 61268203.45 (MAXimum)
 
    No. Row name     St      Activity         Slack   Lower bound       Activity      Obj coef  Obj value at Limiting
                                           Marginal   Upper bound          range         range   break point variable
 ------ ------------ -- ------------- ------------- -------------  ------------- ------------- ------------- ------------
     11 Component_Availability[F5X]
-                    BS   93020.29195  906979.70805          -Inf    67884.75669     -10.12965    1.6967e+07 blend[Regular,HBY]
-                                            .              1e+06   107182.98046       5.10773   1.83844e+07 Property_Max[SUL,Premium]
+                    BS  192962.25707  807037.74293          -Inf   189146.70974      -9.92706   5.93527e+07 blend[Premium,HBY]
+                                            .              1e+06   249094.36260       5.00558   6.22341e+07 Property_Max[SUL,Regular]
 
     12 Component_Availability[RCG]
-                    BS  336878.46268  663121.53732          -Inf   294229.42770      -1.69615   1.73379e+07 Property_Max[SUL,Premium]
-                                            .              1e+06   344798.74194      32.14713    2.8739e+07 blend[Regular,HBY]
+                    BS  336845.07892  663154.92108          -Inf   167810.77944      -1.66223   6.07083e+07 Property_Max[SUL,Regular]
+                                            .              1e+06   355861.17905       9.89093   6.45999e+07 blend[Super_Premium,RCG]
 
     13 Component_Availability[IC4]
-                    BS   28100.08179  971899.91821          -Inf    15579.92919     -20.37076   1.73369e+07 Property_Max[RVI,Regular]
-                                            .              1e+06    32206.38372     110.07616   2.10024e+07 Property_Max[OLEFIN,Regular]
+                    BS   30375.71200  969624.28800          -Inf    17855.55940     -19.96335   6.06618e+07 Property_Max[RVI,Regular]
+                                            .              1e+06    31005.21050     107.87464    6.4545e+07 Property_Max[OLEFIN,Premium]
 
     14 Component_Availability[HBY]
-                    BS        .              1e+06          -Inf         .               -Inf   1.79093e+07
-                                            .              1e+06    21208.32873      12.00539   1.79093e+07 blend[Regular,HBY]
+                    BS        .              1e+06          -Inf         .               -Inf   6.12682e+07
+                                            .              1e+06     3219.40159      11.76528   6.12682e+07 blend[Premium,HBY]
 
     15 Component_Availability[AKK]
-                    BS  197802.23462  802197.76538          -Inf   115280.33658     -34.91313   1.10034e+07 Property_Min[RON,Regular]
-                                            .              1e+06   201025.09151      22.44567   2.23491e+07 Property_Max[SUL,Premium]
+                    BS  201673.11247  798326.88753          -Inf   119151.21443     -34.21486    5.4368e+07 Property_Min[RON,Regular]
+                                            .              1e+06   214446.51653      21.99676   6.57044e+07 Property_Max[SUL,Regular]
 
     16 Component_Availability[ETH]
-                    BS   62587.69408  937412.30592          -Inf    42569.38362     -77.45495   1.30616e+07 Property_Max[OXY,Regular]
-                                            .              1e+06    62587.69408          +Inf          +Inf
+                    BS  104657.84934  895342.15066          -Inf    84639.53888     -75.90585   5.33241e+07 Property_Max[OXY,Regular]
+                                            .              1e+06   104657.84934          +Inf          +Inf
 
     17 Component_Min_Requirement[C4B]
-                    BS        .             .             .              .               -Inf   1.79093e+07
-                                            .               +Inf       33.09543      35.67113   1.79093e+07 blend[Super_Premium,C4B]
+                    BS        .             .             .              .               -Inf   6.12682e+07
+                                            .               +Inf     3548.23042      36.69681   6.12682e+07 blend[Super_Premium,C4B]
 
     18 Component_Min_Requirement[IS1]
-                    BS      90.61370     -90.61370        .            81.63631    -131.50271   1.78974e+07 blend[Super_Premium,C4B]
-                                            .               +Inf     8606.88642      35.94682   1.79125e+07 blend[Regular,IS1]
+                    BS   23616.12844  -23616.12844        .         22997.27188    -210.40210   5.62993e+07 blend[Super_Premium,C4B]
+                                            .               +Inf    29844.94571      30.19624   6.19813e+07 blend[Super_Premium,RCG]
 
     19 Component_Min_Requirement[RFL]
-                    BS   85520.62119  -85520.62119        .         81243.71032     -71.57804   1.17879e+07 blend[Regular,IS1]
-                                            .               +Inf   113523.96131       2.58323   1.81302e+07 Property_Max[SUL,Premium]
+                    BS  309869.86176 -309869.86176        .        294361.58593     -12.12816   5.75101e+07 blend[Super_Premium,RCG]
+                                            .               +Inf   420857.71840       2.53157   6.20527e+07 Property_Max[SUL,Regular]
 
     20 Component_Min_Requirement[F5X]
-                    BS   93020.29195  -93020.29195        .         67884.75669     -10.12965    1.6967e+07 blend[Regular,HBY]
-                                            .               +Inf   107182.98046       5.10773   1.83844e+07 Property_Max[SUL,Premium]
+                    BS  192962.25707 -192962.25707        .        189146.70974      -9.92706   5.93527e+07 blend[Premium,HBY]
+                                            .               +Inf   249094.36260       5.00558   6.22341e+07 Property_Max[SUL,Regular]
 
 GLPK 4.65 - SENSITIVITY ANALYSIS REPORT                                                                         Page   3
 
 Problem:    model
-Objective:  Total_Profit = 17909285.15 (MAXimum)
+Objective:  Total_Profit = 61268203.45 (MAXimum)
 
    No. Row name     St      Activity         Slack   Lower bound       Activity      Obj coef  Obj value at Limiting
                                           Marginal   Upper bound          range         range   break point variable
 ------ ------------ -- ------------- ------------- -------------  ------------- ------------- ------------- ------------
     21 Component_Min_Requirement[RCG]
-                    BS  336878.46268 -336878.46268        .        294229.42770      -1.69615   1.73379e+07 Property_Max[SUL,Premium]
-                                            .               +Inf   344798.74194      32.14713    2.8739e+07 blend[Regular,HBY]
+                    BS  336845.07892 -336845.07892        .        167810.77944      -1.66223   6.07083e+07 Property_Max[SUL,Regular]
+                                            .               +Inf   355861.17905       9.89093   6.45999e+07 blend[Super_Premium,RCG]
 
     22 Component_Min_Requirement[IC4]
-                    BS   28100.08179  -28100.08179        .         15579.92919     -20.37076   1.73369e+07 Property_Max[RVI,Regular]
-                                            .               +Inf    32206.38372     110.07616   2.10024e+07 Property_Max[OLEFIN,Regular]
+                    BS   30375.71200  -30375.71200        .         17855.55940     -19.96335   6.06618e+07 Property_Max[RVI,Regular]
+                                            .               +Inf    31005.21050     107.87464    6.4545e+07 Property_Max[OLEFIN,Premium]
 
     23 Component_Min_Requirement[HBY]
-                    BS        .             .             .              .               -Inf   1.79093e+07
-                                            .               +Inf    21208.32873      12.00539   1.79093e+07 blend[Regular,HBY]
+                    BS        .             .             .              .               -Inf   6.12682e+07
+                                            .               +Inf     3219.40159      11.76528   6.12682e+07 blend[Premium,HBY]
 
     24 Component_Min_Requirement[AKK]
-                    BS  197802.23462 -197802.23462        .        115280.33658     -34.91313   1.10034e+07 Property_Min[RON,Regular]
-                                            .               +Inf   201025.09151      22.44567   2.23491e+07 Property_Max[SUL,Premium]
+                    BS  201673.11247 -201673.11247        .        119151.21443     -34.21486    5.4368e+07 Property_Min[RON,Regular]
+                                            .               +Inf   214446.51653      21.99676   6.57044e+07 Property_Max[SUL,Regular]
 
     25 Component_Min_Requirement[ETH]
-                    BS   62587.69408  -62587.69408        .         42569.38362     -77.45495   1.30616e+07 Property_Max[OXY,Regular]
-                                            .               +Inf    62587.69408          +Inf          +Inf
+                    BS  104657.84934 -104657.84934        .         84639.53888     -75.90585   5.33241e+07 Property_Max[OXY,Regular]
+                                            .               +Inf   104657.84934          +Inf          +Inf
 
     26 Property_Min[SPG,Regular]
-                    BS    5969.69581   -5969.69581        .          3129.11860    -100.93289   1.73067e+07 Property_Max[SUL,Regular]
-                                            .               +Inf     9677.42151      68.78747   1.83199e+07 Property_Max[RVI,Regular]
+                    BS    5969.69581   -5969.69581        .          3129.11860     -98.91423   6.06777e+07 Property_Max[SUL,Regular]
+                                            .               +Inf     9677.42151      67.41172   6.16706e+07 Property_Max[RVI,Regular]
 
     27 Property_Min[SPG,Premium]
-                    BS   14137.94910  -14137.94910        .         13421.24322    -100.93289   1.64823e+07 Property_Max[SUL,Premium]
-                                            .               +Inf    14669.16802      68.78747   1.88818e+07 Property_Max[RVI,Premium]
+                    BS   14137.94910  -14137.94910        .         13421.24322     -98.91423   5.98698e+07 Property_Max[SUL,Premium]
+                                            .               +Inf    14669.16802      67.41172   6.22213e+07 Property_Max[RVI,Premium]
 
     28 Property_Min[SPG,Super_Premium]
-                    BS     165.71546    -165.71546        .           164.98835    -175.06946   1.78803e+07 Property_Min[MON,Super_Premium]
-                                            .               +Inf      166.32888    1177.20323   1.81044e+07 Property_Max[RVI,Super_Premium]
+                    BS   16025.82398  -16025.82398        .         15209.47111    -416.95316   5.45862e+07 Property_Max[ARO,Super_Premium]
+                                            .               +Inf    16160.78663    1433.32790   8.42385e+07 Property_Max[RVI,Super_Premium]
 
     29 Property_Min[SUL,Regular]
-                    BS         4e+06        -4e+06        .         1.07205e+06       -.09792   1.75176e+07 Property_Max[SUL,Regular]
+                    BS         4e+06        -4e+06        .         1.07205e+06       -.09596   6.08844e+07 Property_Max[SUL,Regular]
                                             .               +Inf          4e+06          +Inf          +Inf
 
     30 Property_Min[SUL,Premium]
-                    BS         4e+06        -4e+06        .         3.26125e+06       -.09792   1.75176e+07 Property_Max[SUL,Premium]
+                    BS         4e+06        -4e+06        .         3.26125e+06       -.09596   6.08844e+07 Property_Max[SUL,Premium]
                                             .               +Inf          4e+06          +Inf          +Inf
 
 GLPK 4.65 - SENSITIVITY ANALYSIS REPORT                                                                         Page   4
 
 Problem:    model
-Objective:  Total_Profit = 17909285.15 (MAXimum)
+Objective:  Total_Profit = 61268203.45 (MAXimum)
 
    No. Row name     St      Activity         Slack   Lower bound       Activity      Obj coef  Obj value at Limiting
                                           Marginal   Upper bound          range         range   break point variable
 ------ ------------ -- ------------- ------------- -------------  ------------- ------------- ------------- ------------
     31 Property_Min[SUL,Super_Premium]
-                    BS   11425.77203  -11425.77203        .         10846.62992       -.21980   1.79068e+07 Property_Min[MON,Super_Premium]
-                                            .               +Inf    11425.77203          +Inf          +Inf
+                    BS   1.08677e+06  -1.08677e+06        .         1.06346e+06      -5.58728   5.51961e+07 blend[Super_Premium,C4B]
+                                            .               +Inf    1.41337e+06        .57590   6.18941e+07 blend[Super_Premium,RCG]
 
     32 Property_Min[RON,Regular]
-                    NL        .             .             .        -91510.63237          -Inf   1.80611e+07 blend[Regular,RFL]
-                                          -1.65844          +Inf    1.73723e+06       1.65844   1.50282e+07 Property_Min[E10,Regular]
+                    NL        .             .             .        -91510.63237          -Inf   6.14169e+07 blend[Regular,RFL]
+                                          -1.62527          +Inf    1.73723e+06       1.62527   5.84447e+07 Property_Min[E10,Regular]
 
     33 Property_Min[RON,Premium]
-                    NL        .             .             .       -599904.71729          -Inf   1.89042e+07 Property_Min[ROI,Premium]
-                                          -1.65844          +Inf   137232.18134       1.65844   1.76817e+07 Property_Min[E10,Premium]
+                    NL        .             .             .       -599904.71729          -Inf   6.22432e+07 Property_Min[ROI,Premium]
+                                          -1.62527          +Inf   137232.18134       1.62527   6.10452e+07 Property_Min[E10,Premium]
 
     34 Property_Min[RON,Super_Premium]
-                    NL        .             .             .         -4011.34486          -Inf   1.79197e+07 Component_Min_Requirement[IS1]
-                                          -2.59573          +Inf      450.90451       2.59573   1.79081e+07 blend[Super_Premium,RCG]
+                    NL        .             .             .        -68333.32638          -Inf   6.16088e+07 Property_Min[E10,Super_Premium]
+                                          -4.98486          +Inf    46277.91918       4.98486   6.10375e+07 blend[Super_Premium,AKK]
 
     35 Property_Min[ROI,Regular]
-                    BS   1.08776e+06  -1.08776e+06        .        677979.93835      -3.78377   1.37934e+07 Property_Max[OXY,Regular]
-                                            .               +Inf    3.22418e+06       1.34856   1.93762e+07 Property_Min[RON,Regular]
+                    BS   1.08776e+06  -1.08776e+06        .        677979.93835      -3.70809   5.72347e+07 Property_Max[OXY,Regular]
+                                            .               +Inf    3.22418e+06       1.32159   6.27058e+07 Property_Min[RON,Regular]
 
     36 Property_Min[ROI,Premium]
-                    BS  737753.89936 -737753.89936        .        705383.34710      -3.78377   1.51178e+07 Property_Max[OXY,Premium]
-                                            .               +Inf   906519.99501       1.34856   1.89042e+07 Property_Min[RON,Premium]
+                    BS  737753.89936 -737753.89936        .        705383.34710      -3.70809   5.85325e+07 Property_Max[OXY,Premium]
+                                            .               +Inf   906519.99501       1.32159   6.22432e+07 Property_Min[RON,Premium]
 
     37 Property_Min[ROI,Super_Premium]
-                    BS    6641.17983   -6641.17983        .          6513.17607      -7.14194   1.78619e+07 Property_Max[OXY,Super_Premium]
-                                            .               +Inf     7189.80969       2.13336   1.79235e+07 Property_Min[RON,Super_Premium]
+                    BS  519288.13168 -519288.13168        .        483728.68799      -8.02639   5.71002e+07 Property_Max[OXY,Super_Premium]
+                                            .               +Inf   567606.02380       4.77440   6.37475e+07 Property_Min[RON,Super_Premium]
 
     38 Property_Min[MON,Regular]
-                    BS   2.56798e+06  -2.56798e+06        .         2.37314e+06      -1.30900   1.45478e+07 Property_Max[RVI,Regular]
-                                            .               +Inf     3.3426e+06        .37013   1.88598e+07 Property_Max[SUL,Regular]
+                    BS   2.56798e+06  -2.56798e+06        .         2.37314e+06      -1.28282   5.79739e+07 Property_Max[RVI,Regular]
+                                            .               +Inf     3.3426e+06        .36272   6.21997e+07 Property_Max[SUL,Regular]
 
     39 Property_Min[MON,Premium]
-                    BS  560417.96867 -560417.96867        .        532502.70501      -1.30900   1.71757e+07 Property_Max[RVI,Premium]
-                                            .               +Inf   755862.11334        .37013   1.81167e+07 Property_Max[SUL,Premium]
+                    BS  560417.96867 -560417.96867        .        532502.70501      -1.28282   6.05493e+07 Property_Max[RVI,Premium]
+                                            .               +Inf   755862.11334        .36272   6.14715e+07 Property_Max[SUL,Premium]
 
     40 Property_Min[MON,Super_Premium]
-                    NL        .             .             .          -758.90806          -Inf   1.79099e+07 Property_Min[MOI,Super_Premium]
-                                           -.87224          +Inf      145.93913        .87224   1.79092e+07 blend[Super_Premium,RCG]
+                    BS  652556.44552 -652556.44552        .        543062.44701      -1.71778   6.01473e+07 blend[Super_Premium,RCG]
+                                            .               +Inf   652556.44552          +Inf          +Inf
 
 GLPK 4.65 - SENSITIVITY ANALYSIS REPORT                                                                         Page   5
 
 Problem:    model
-Objective:  Total_Profit = 17909285.15 (MAXimum)
+Objective:  Total_Profit = 61268203.45 (MAXimum)
 
    No. Row name     St      Activity         Slack   Lower bound       Activity      Obj coef  Obj value at Limiting
                                           Marginal   Upper bound          range         range   break point variable
 ------ ------------ -- ------------- ------------- -------------  ------------- ------------- ------------- ------------
     41 Property_Min[MOI,Regular]
-                    BS   3.21658e+06  -3.21658e+06        .         2.95084e+06       -.95974   1.48222e+07 Property_Max[RVI,Regular]
-                                            .               +Inf    4.06248e+06        .33894   1.89995e+07 Property_Max[SUL,Regular]
+                    BS   3.21658e+06  -3.21658e+06        .         2.95084e+06       -.94055   5.82429e+07 Property_Max[RVI,Regular]
+                                            .               +Inf    4.06248e+06        .33216   6.23366e+07 Property_Max[SUL,Regular]
 
     42 Property_Min[MOI,Premium]
-                    BS   1.01221e+06  -1.01221e+06        .        974136.96370       -.95974   1.69378e+07 Property_Max[RVI,Premium]
-                                            .               +Inf    1.22564e+06        .33894   1.82524e+07 Property_Max[SUL,Premium]
+                    BS   1.01221e+06  -1.01221e+06        .        974136.96370       -.94055   6.03162e+07 Property_Max[RVI,Premium]
+                                            .               +Inf    1.22564e+06        .33216   6.16044e+07 Property_Max[SUL,Premium]
 
     43 Property_Min[MOI,Super_Premium]
-                    BS     817.77911    -817.77911        .           768.66013     -14.70142   1.78973e+07 Property_Max[RVI,Super_Premium]
-                                            .               +Inf      975.03923        .80945   1.79099e+07 Property_Min[MON,Super_Premium]
+                    BS  951845.45250 -951845.45250        .        825586.93927      -1.48970   5.98502e+07 blend[Super_Premium,RCG]
+                                            .               +Inf   951845.45250          +Inf          +Inf
 
     44 Property_Min[RVP,Regular]
-                    BS  247579.52938 -247579.52938        .        191584.55606      -4.55478   1.67816e+07 Property_Max[RVI,Regular]
-                                            .               +Inf   258986.01550      25.13549   2.41323e+07 Property_Max[SUL,Regular]
+                    BS  247579.52938 -247579.52938        .        191584.55606      -4.46369   6.01631e+07 Property_Max[RVI,Regular]
+                                            .               +Inf   258986.01550      24.63278   6.73668e+07 Property_Max[SUL,Regular]
 
     45 Property_Min[RVP,Premium]
-                    BS  239514.16095 -239514.16095        .        231491.56397      -4.55478   1.68183e+07 Property_Max[RVI,Premium]
-                                            .               +Inf   242392.13085      25.13549   2.39296e+07 Property_Max[SUL,Premium]
+                    BS  239514.16095 -239514.16095        .        231491.56397      -4.46369   6.01991e+07 Property_Max[RVI,Premium]
+                                            .               +Inf   242392.13085      24.63278   6.71681e+07 Property_Max[SUL,Premium]
 
     46 Property_Min[RVP,Super_Premium]
-                    BS    2515.16204   -2515.16204        .          2483.64432     -22.91153   1.78517e+07 Property_Max[RVI,Super_Premium]
-                                            .               +Inf     2517.74924      49.20161    1.8033e+07 Property_Min[MON,Super_Premium]
+                    BS  251717.94169 -251717.94169        .        244577.95452     -27.09329   5.44483e+07 Property_Max[RVI,Super_Premium]
+                                            .               +Inf   253361.69958     207.07485   1.13393e+08 Property_Max[ARO,Super_Premium]
 
     47 Property_Min[RVI,Regular]
-                    BS   7.24674e+06  -7.24674e+06        .         4.94724e+06       -.11091   1.71055e+07 Property_Max[RVI,Regular]
+                    BS   7.24674e+06  -7.24674e+06        .         4.94724e+06       -.10870   6.04805e+07 Property_Max[RVI,Regular]
                                             .               +Inf    7.24674e+06          +Inf          +Inf
 
     48 Property_Min[RVI,Premium]
-                    BS   7.24674e+06  -7.24674e+06        .         6.91728e+06       -.11091   1.71055e+07 Property_Max[RVI,Premium]
+                    BS   7.24674e+06  -7.24674e+06        .         6.91728e+06       -.10870   6.04805e+07 Property_Max[RVI,Premium]
                                             .               +Inf    7.24674e+06          +Inf          +Inf
 
     49 Property_Min[RVI,Super_Premium]
-                    BS   72467.37735  -72467.37735        .         70971.34793       -.48269   1.78743e+07 Property_Max[RVI,Super_Premium]
-                                            .               +Inf    72467.37735          +Inf          +Inf
+                    BS   7.24674e+06  -7.24674e+06        .         6.91957e+06       -.59127   5.69835e+07 Property_Max[RVI,Super_Premium]
+                                            .               +Inf    7.24674e+06          +Inf          +Inf
 
     50 Property_Min[E70,Regular]
-                    BS   1.49998e+06  -1.49998e+06        .        -76398.99813       -.16974   1.76547e+07 blend[Regular,HBY]
-                                            .               +Inf    4.65837e+06        .09078   1.80454e+07 Property_Max[SUL,Regular]
+                    BS   1.49998e+06  -1.49998e+06        .        -76398.99813       -.16635   6.10187e+07 blend[Regular,HBY]
+                                            .               +Inf    4.65837e+06        .08896   6.14016e+07 Property_Max[SUL,Regular]
 
 GLPK 4.65 - SENSITIVITY ANALYSIS REPORT                                                                         Page   6
 
 Problem:    model
-Objective:  Total_Profit = 17909285.15 (MAXimum)
+Objective:  Total_Profit = 61268203.45 (MAXimum)
 
    No. Row name     St      Activity         Slack   Lower bound       Activity      Obj coef  Obj value at Limiting
                                           Marginal   Upper bound          range         range   break point variable
 ------ ------------ -- ------------- ------------- -------------  ------------- ------------- ------------- ------------
     51 Property_Min[E70,Premium]
-                    BS  973971.97994 -973971.97994        .        746276.28105       -.16974    1.7744e+07 blend[Premium,HBY]
-                                            .               +Inf    1.77086e+06        .09078   1.79977e+07 Property_Max[SUL,Premium]
+                    BS  973971.97994 -973971.97994        .        746276.28105       -.16635   6.11062e+07 blend[Premium,HBY]
+                                            .               +Inf    1.77086e+06        .08896   6.13548e+07 Property_Max[SUL,Premium]
 
     52 Property_Min[E70,Super_Premium]
-                    BS   48903.58731  -48903.58731        .              .           -8.89252   1.74744e+07 Max_Volume[Super_Premium]
-                                            .               +Inf    49681.14218        .16371   1.79173e+07 Property_Min[MON,Super_Premium]
+                    BS   5.86516e+06  -5.86516e+06        .         58651.55761      -7.37632   1.80049e+07 Max_Volume[Super_Premium]
+                                            .               +Inf    6.62096e+06        .45035   6.39096e+07 Property_Max[ARO,Super_Premium]
 
     53 Property_Min[E10,Regular]
-                    BS   2.34608e+06  -2.34608e+06        .         1.05255e+06       -.19717   1.74467e+07 Property_Max[RVI,Regular]
-                                            .               +Inf     2.9762e+06        .48583   1.90491e+07 blend[Regular,IS1]
+                    BS   2.34608e+06  -2.34608e+06        .         1.05255e+06       -.19323   6.08149e+07 Property_Max[RVI,Regular]
+                                            .               +Inf     2.9762e+06        .47611   6.23852e+07 blend[Regular,IS1]
 
     54 Property_Min[E10,Premium]
-                    BS  185327.72438 -185327.72438        .       -657752.86013       -.19717   1.78727e+07 Property_Max[RVI,Premium]
-                                            .               +Inf    9.14588e+06        .48583   1.79993e+07 blend[Premium,IS1]
+                    BS  185327.72438 -185327.72438        .       -657752.86013       -.19323   6.12324e+07 Property_Max[RVI,Premium]
+                                            .               +Inf    9.14588e+06        .47611   6.13564e+07 blend[Premium,IS1]
 
     55 Property_Min[E10,Super_Premium]
-                    NL        .             .             .         -5799.61450          -Inf   1.79124e+07 Property_Max[ARO,Super_Premium]
-                                           -.52953          +Inf     3004.74755        .52953   1.79077e+07 blend[Super_Premium,RCG]
+                    BS  388989.05179 -388989.05179        .          3889.89052    -111.21980   1.80049e+07 Max_Volume[Super_Premium]
+                                            .               +Inf   931797.69632        .34651    6.1403e+07 blend[Super_Premium,RCG]
 
     56 Property_Min[E15,Regular]
-                    BS   3.95389e+06  -3.95389e+06        .         3.42467e+06       -.48192   1.60038e+07 Property_Max[RVI,Regular]
-                                            .               +Inf     6.4014e+06        .11714   1.83725e+07 Property_Max[SUL,Regular]
+                    BS   3.95389e+06  -3.95389e+06        .         3.42467e+06       -.47228   5.94009e+07 Property_Max[RVI,Regular]
+                                            .               +Inf     6.4014e+06        .11480   6.17221e+07 Property_Max[SUL,Regular]
 
     57 Property_Min[E15,Premium]
-                    BS   1.91879e+06  -1.91879e+06        .         1.84297e+06       -.48192   1.69846e+07 Property_Max[RVI,Premium]
-                                            .               +Inf    2.53632e+06        .11714   1.81341e+07 Property_Max[SUL,Premium]
+                    BS   1.91879e+06  -1.91879e+06        .         1.84297e+06       -.47228    6.0362e+07 Property_Max[RVI,Premium]
+                                            .               +Inf    2.53632e+06        .11480   6.14885e+07 Property_Max[SUL,Premium]
 
     58 Property_Min[E15,Super_Premium]
-                    BS   34192.01001  -34192.01001        .              .          -12.71865   1.74744e+07 Max_Volume[Super_Premium]
-                                            .               +Inf    34701.82444        .24969   1.79178e+07 Property_Min[MON,Super_Premium]
+                    BS   3.31359e+06  -3.31359e+06        .         3.12212e+06       -.98232   5.80132e+07 blend[Super_Premium,RCG]
+                                            .               +Inf    3.44353e+06       2.61951   6.99482e+07 Property_Max[ARO,Super_Premium]
 
     59 Property_Min[ARO,Regular]
-                    BS   8.78364e+06  -8.78364e+06        .         7.12336e+06       -.17269   1.63925e+07 Property_Max[SUL,Regular]
-                                            .               +Inf    9.79119e+06        .25313   2.01327e+07 Property_Max[RVI,Regular]
+                    BS   8.78364e+06  -8.78364e+06        .         7.12336e+06       -.16923   5.97817e+07 Property_Max[SUL,Regular]
+                                            .               +Inf    9.79119e+06        .24807   6.34472e+07 Property_Max[RVI,Regular]
 
     60 Property_Min[ARO,Premium]
-                    BS   1.33433e+07  -1.33433e+07        .         1.29244e+07       -.17269   1.56051e+07 Property_Max[SUL,Premium]
-                                            .               +Inf    1.34877e+07        .25313   2.12869e+07 Property_Max[RVI,Premium]
+                    BS   1.33433e+07  -1.33433e+07        .         1.29244e+07       -.16923   5.90101e+07 Property_Max[SUL,Premium]
+                                            .               +Inf    1.34877e+07        .24807   6.45783e+07 Property_Max[RVI,Premium]
 
 GLPK 4.65 - SENSITIVITY ANALYSIS REPORT                                                                         Page   7
 
 Problem:    model
-Objective:  Total_Profit = 17909285.15 (MAXimum)
+Objective:  Total_Profit = 61268203.45 (MAXimum)
 
    No. Row name     St      Activity         Slack   Lower bound       Activity      Obj coef  Obj value at Limiting
                                           Marginal   Upper bound          range         range   break point variable
 ------ ------------ -- ------------- ------------- -------------  ------------- ------------- ------------- ------------
     61 Property_Min[ARO,Super_Premium]
-                    BS  136899.47406 -136899.47406        .        136512.69368       -.32911   1.78642e+07 Property_Min[MON,Super_Premium]
-                                            .               +Inf   137554.51523       1.78680   1.81539e+07 Property_Min[RON,Super_Premium]
+                    BS       1.4e+07      -1.4e+07        .         1.37106e+07      -1.17624   4.48009e+07 Property_Max[ARO,Super_Premium]
+                                            .               +Inf        1.4e+07          +Inf          +Inf
 
     62 Property_Min[BEN,Regular]
-                    BS  346040.02555 -346040.02555        .        169358.70752      -1.62274   1.73478e+07 Property_Max[SUL,Regular]
-                                            .               +Inf   360393.78778      17.76852   2.40579e+07 Property_Max[RVI,Regular]
+                    BS  346040.02555 -346040.02555        .        169358.70752      -1.59028   6.07179e+07 Property_Max[SUL,Regular]
+                                            .               +Inf   360393.78778      17.41315   6.72938e+07 Property_Max[RVI,Regular]
 
     63 Property_Min[BEN,Premium]
-                    BS  376038.52239 -376038.52239        .        331460.06858      -1.62274   1.72991e+07 Property_Max[SUL,Premium]
-                                            .               +Inf   378095.03645      17.76852   2.45909e+07 Property_Max[RVI,Premium]
+                    BS  376038.52239 -376038.52239        .        331460.06858      -1.59028   6.06702e+07 Property_Max[SUL,Premium]
+                                            .               +Inf   378095.03645      17.41315   6.78162e+07 Property_Max[RVI,Premium]
 
     64 Property_Min[BEN,Super_Premium]
-                    BS    2175.49346   -2175.49346        .          2140.19661      -3.60640   1.79014e+07 Property_Min[MON,Super_Premium]
-                                            .               +Inf     2175.49346          +Inf          +Inf
+                    BS  216405.51676 -216405.51676        .        212397.04767     -43.01708   5.19591e+07 blend[Super_Premium,HBY]
+                                            .               +Inf   235004.03917      10.11300   6.34567e+07 blend[Super_Premium,RCG]
 
     65 Property_Min[OXY,Regular]
-                    BS      1.08e+06     -1.08e+06        .        383763.16218      -2.22700   1.55041e+07 Property_Max[OXY,Regular]
+                    BS      1.08e+06     -1.08e+06        .        383763.16218      -2.18246   5.89111e+07 Property_Max[OXY,Regular]
                                             .               +Inf       1.08e+06          +Inf          +Inf
 
     66 Property_Min[OXY,Premium]
-                    BS      1.08e+06     -1.08e+06        .           1.025e+06      -2.22700   1.55041e+07 Property_Max[OXY,Premium]
+                    BS      1.08e+06     -1.08e+06        .           1.025e+06      -2.18246   5.89111e+07 Property_Max[OXY,Premium]
                                             .               +Inf       1.08e+06          +Inf          +Inf
 
     67 Property_Min[OXY,Super_Premium]
-                    BS   16800.00000  -16800.00000        .         16596.09531      -4.48344    1.7834e+07 Property_Max[OXY,Super_Premium]
-                                            .               +Inf    16800.00000          +Inf          +Inf
+                    BS      1.48e+06     -1.48e+06        .         1.43779e+06      -6.76147   5.12612e+07 Property_Max[OXY,Super_Premium]
+                                            .               +Inf       1.48e+06          +Inf          +Inf
 
     68 Property_Min[OLEFIN,Regular]
-                    BS         6e+06        -6e+06        .         5.00689e+06       -.45514   1.51784e+07 Property_Max[OLEFIN,Regular]
+                    BS         6e+06        -6e+06        .         5.00689e+06       -.44604    5.8592e+07 Property_Max[OLEFIN,Regular]
                                             .               +Inf          6e+06          +Inf          +Inf
 
     69 Property_Min[OLEFIN,Premium]
-                    BS         6e+06        -6e+06        .         5.84776e+06       -.45514   1.51784e+07 Property_Max[OLEFIN,Premium]
+                    BS         6e+06        -6e+06        .         5.84776e+06       -.44604    5.8592e+07 Property_Max[OLEFIN,Premium]
                                             .               +Inf          6e+06          +Inf          +Inf
 
     70 Property_Min[OLEFIN,Super_Premium]
-                    BS   60000.00000  -60000.00000        .         57785.70940      -1.13617   1.78411e+07 Property_Max[OLEFIN,Super_Premium]
-                                            .               +Inf    60000.00000          +Inf          +Inf
+                    BS         6e+06        -6e+06        .          5.4418e+06      -1.28242   5.35737e+07 Property_Max[OLEFIN,Super_Premium]
+                                            .               +Inf          6e+06          +Inf          +Inf
 
 GLPK 4.65 - SENSITIVITY ANALYSIS REPORT                                                                         Page   8
 
 Problem:    model
-Objective:  Total_Profit = 17909285.15 (MAXimum)
+Objective:  Total_Profit = 61268203.45 (MAXimum)
 
    No. Row name     St      Activity         Slack   Lower bound       Activity      Obj coef  Obj value at Limiting
                                           Marginal   Upper bound          range         range   break point variable
 ------ ------------ -- ------------- ------------- -------------  ------------- ------------- ------------- ------------
     71 Property_Max[SPG,Regular]
-                    BS  -18030.30419   18030.30419          -Inf   -20870.88140    -100.93289   1.97291e+07 Property_Max[SUL,Regular]
-                                            .             .        -14322.57849      68.78747    1.6669e+07 Property_Max[RVI,Regular]
+                    BS  -18030.30419   18030.30419          -Inf   -20870.88140     -98.91423   6.30517e+07 Property_Max[SUL,Regular]
+                                            .             .        -14322.57849      67.41172   6.00527e+07 Property_Max[RVI,Regular]
 
     72 Property_Max[SPG,Premium]
-                    BS   -9862.05090    9862.05090          -Inf   -10578.75678    -100.93289   1.89047e+07 Property_Max[SUL,Premium]
-                                            .             .         -9330.83198      68.78747   1.72309e+07 Property_Max[RVI,Premium]
+                    BS   -9862.05090    9862.05090          -Inf   -10578.75678     -98.91423   6.22437e+07 Property_Max[SUL,Premium]
+                                            .             .         -9330.83198      67.41172   6.06034e+07 Property_Max[RVI,Premium]
 
     73 Property_Max[SPG,Super_Premium]
-                    BS     -74.28454      74.28454          -Inf      -75.01165    -175.06946   1.79223e+07 Property_Min[MON,Super_Premium]
-                                            .             .           -73.67112    1177.20323   1.78218e+07 Property_Max[RVI,Super_Premium]
+                    BS   -7974.17602    7974.17602          -Inf    -8790.52889    -416.95316   6.45931e+07 Property_Max[ARO,Super_Premium]
+                                            .             .         -7839.21337    1433.32790   4.98386e+07 Property_Max[RVI,Super_Premium]
 
     74 Property_Max[SUL,Regular]
-                    NU        .             .               -Inf   -2.92795e+06       -.09792   1.76226e+07 blend[Regular,RCG]
-                                            .09792        .        112828.55681          +Inf   1.79203e+07 blend[Regular,RFL]
+                    NU        .             .               -Inf   -2.92795e+06       -.09596   6.09872e+07 blend[Regular,RCG]
+                                            .09596        .        112828.55681          +Inf    6.1279e+07 blend[Regular,RFL]
 
     75 Property_Max[SUL,Premium]
-                    NU        .             .               -Inf  -738751.99753       -.09792   1.78369e+07 Property_Min[E10,Premium]
-                                            .09792        .        397088.45708          +Inf   1.79482e+07 Property_Max[BEN,Premium]
+                    NU        .             .               -Inf  -738751.99753       -.09596   6.11973e+07 Property_Min[E10,Premium]
+                                            .09596        .        397088.45708          +Inf   6.13063e+07 Property_Max[BEN,Premium]
 
     76 Property_Max[SUL,Super_Premium]
-                    BS  -28574.22797   28574.22797          -Inf   -29153.37008       -.21980   1.79156e+07 Property_Min[MON,Super_Premium]
-                                            .             .              .           15.21917   1.74744e+07 Max_Volume[Super_Premium]
+                    BS  -2.91323e+06   2.91323e+06          -Inf   -2.93654e+06      -5.58728   7.75453e+07 blend[Super_Premium,C4B]
+                                            .             .        -2.58663e+06        .57590   5.95905e+07 blend[Super_Premium,RCG]
 
     77 Property_Max[RON,Regular]
                     BS  -3.99963e+11   3.99963e+11          -Inf   -3.99963e+11          -Inf          +Inf
-                                            .             .        -3.99963e+09        .00002   9.84533e+06 Max_Volume[Regular]
+                                            .             .             -.00043        .00002   5.33655e+07 Max_Volume[Regular]
 
     78 Property_Max[RON,Premium]
                     BS  -3.99962e+11   3.99962e+11          -Inf   -3.99962e+11          -Inf          +Inf
-                                            .             .             -.01416        .00002   8.49883e+06 Max_Volume[Premium]
+                                            .             .             -.00189        .00003    5.1166e+07 Max_Volume[Premium]
 
     79 Property_Max[RON,Super_Premium]
-                    BS   -3.9996e+09    3.9996e+09          -Inf    -3.9996e+09          -Inf          +Inf
-                                            .             .             -.00016        .00011   1.74744e+07 Max_Volume[Super_Premium]
+                    BS   -3.9996e+11    3.9996e+11          -Inf    -3.9996e+11          -Inf          +Inf
+                                            .             .         -3.9996e+09        .00011   1.80049e+07 Max_Volume[Super_Premium]
 
     80 Property_Max[ROI,Regular]
-                    BS  -3.99957e+11   3.99957e+11          -Inf   -3.99957e+11      -3.78377   1.51336e+12 Property_Max[OXY,Regular]
-                                            .             .        -3.99957e+09        .00002   9.84533e+06 Max_Volume[Regular]
+                    BS  -3.99957e+11   3.99957e+11          -Inf   -3.99957e+11      -3.70809   1.48314e+12 Property_Max[OXY,Regular]
+                                            .             .             -.00043        .00002   5.33655e+07 Max_Volume[Regular]
 
 GLPK 4.65 - SENSITIVITY ANALYSIS REPORT                                                                         Page   9
 
 Problem:    model
-Objective:  Total_Profit = 17909285.15 (MAXimum)
+Objective:  Total_Profit = 61268203.45 (MAXimum)
 
    No. Row name     St      Activity         Slack   Lower bound       Activity      Obj coef  Obj value at Limiting
                                           Marginal   Upper bound          range         range   break point variable
 ------ ------------ -- ------------- ------------- -------------  ------------- ------------- ------------- ------------
     81 Property_Max[ROI,Premium]
-                    BS  -3.99955e+11   3.99955e+11          -Inf   -3.99955e+11      -3.78377   1.51335e+12 Property_Max[OXY,Premium]
-                                            .             .             -.01416        .00002   8.49883e+06 Max_Volume[Premium]
+                    BS  -3.99955e+11   3.99955e+11          -Inf   -3.99955e+11      -3.70809   1.48313e+12 Property_Max[OXY,Premium]
+                                            .             .             -.00201        .00003    5.1166e+07 Max_Volume[Premium]
 
     82 Property_Max[ROI,Super_Premium]
-                    BS  -3.99952e+09   3.99952e+09          -Inf   -3.99952e+09      -7.14194   2.85823e+10 Property_Max[OXY,Super_Premium]
-                                            .             .             -.00016        .00011   1.74744e+07 Max_Volume[Super_Premium]
+                    BS  -3.99953e+11   3.99953e+11          -Inf   -3.99953e+11      -8.02639   3.21024e+12 Property_Max[OXY,Super_Premium]
+                                            .             .        -3.99953e+09        .00011   1.80049e+07 Max_Volume[Super_Premium]
 
     83 Property_Max[MON,Regular]
-                    BS  -3.99964e+11   3.99964e+11          -Inf   -3.99964e+11      -1.30900   5.23573e+11 Property_Max[RVI,Regular]
-                                            .             .        -3.99964e+09        .00002   9.84533e+06 Max_Volume[Regular]
+                    BS  -3.99964e+11   3.99964e+11          -Inf   -3.99964e+11      -1.28282   5.13145e+11 Property_Max[RVI,Regular]
+                                            .             .             -.00031        .00002   5.33655e+07 Max_Volume[Regular]
 
     84 Property_Max[MON,Premium]
-                    BS  -3.99965e+11   3.99965e+11          -Inf   -3.99965e+11      -1.30900   5.23573e+11 Property_Max[RVI,Premium]
-                                            .             .             -.01416        .00002   8.49883e+06 Max_Volume[Premium]
+                    BS  -3.99965e+11   3.99965e+11          -Inf   -3.99965e+11      -1.28282   5.13146e+11 Property_Max[RVI,Premium]
+                                            .             .             -.00195        .00003    5.1166e+07 Max_Volume[Premium]
 
     85 Property_Max[MON,Super_Premium]
-                    BS  -3.99964e+09   3.99964e+09          -Inf   -3.99964e+09          -Inf          +Inf
-                                            .             .             -.00016        .00011   1.74744e+07 Max_Volume[Super_Premium]
+                    BS  -3.99964e+11   3.99964e+11          -Inf   -3.99964e+11      -1.71778   6.87113e+11 blend[Super_Premium,RCG]
+                                            .             .        -3.99964e+09        .00011   1.80049e+07 Max_Volume[Super_Premium]
 
     86 Property_Max[MOI,Regular]
-                    BS  -3.99959e+11   3.99959e+11          -Inf   -3.99959e+11       -.95974   3.83876e+11 Property_Max[RVI,Regular]
-                                            .             .        -3.99959e+09        .00002   9.84533e+06 Max_Volume[Regular]
+                    BS  -3.99959e+11   3.99959e+11          -Inf   -3.99959e+11       -.94055   3.76242e+11 Property_Max[RVI,Regular]
+                                            .             .             -.00037        .00002   5.33655e+07 Max_Volume[Regular]
 
     87 Property_Max[MOI,Premium]
-                    BS   -3.9996e+11    3.9996e+11          -Inf    -3.9996e+11       -.95974   3.83876e+11 Property_Max[RVI,Premium]
-                                            .             .             -.01422        .00002   8.49883e+06 Max_Volume[Premium]
+                    BS   -3.9996e+11    3.9996e+11          -Inf    -3.9996e+11       -.94055   3.76242e+11 Property_Max[RVI,Premium]
+                                            .             .             -.00189        .00003    5.1166e+07 Max_Volume[Premium]
 
     88 Property_Max[MOI,Super_Premium]
-                    BS  -3.99959e+09   3.99959e+09          -Inf   -3.99959e+09     -14.70142   5.88176e+10 Property_Max[RVI,Super_Premium]
-                                            .             .             -.00015        .00011   1.74744e+07 Max_Volume[Super_Premium]
+                    BS  -3.99959e+11   3.99959e+11          -Inf   -3.99959e+11      -1.48970   5.95879e+11 blend[Super_Premium,RCG]
+                                            .             .        -3.99959e+09        .00011   1.80049e+07 Max_Volume[Super_Premium]
 
     89 Property_Max[RVP,Regular]
-                    BS  -32420.47062   32420.47062          -Inf   -88415.44394      -4.55478    1.8057e+07 Property_Max[RVI,Regular]
-                                            .             .        -21013.98450      25.13549   1.70944e+07 Property_Max[SUL,Regular]
+                    BS  -32420.47062   32420.47062          -Inf   -88415.44394      -4.46369   6.14129e+07 Property_Max[RVI,Regular]
+                                            .             .        -21013.98450      24.63278   6.04696e+07 Property_Max[SUL,Regular]
 
     90 Property_Max[RVP,Premium]
-                    BS  -40485.83905   40485.83905          -Inf   -48508.43603      -4.55478   1.80937e+07 Property_Max[RVI,Premium]
-                                            .             .        -37607.86915      25.13549   1.68917e+07 Property_Max[SUL,Premium]
+                    BS  -40485.83905   40485.83905          -Inf   -48508.43603      -4.46369   6.14489e+07 Property_Max[RVI,Premium]
+                                            .             .        -37607.86915      24.63278   6.02709e+07 Property_Max[SUL,Premium]
 
 GLPK 4.65 - SENSITIVITY ANALYSIS REPORT                                                                         Page  10
 
 Problem:    model
-Objective:  Total_Profit = 17909285.15 (MAXimum)
+Objective:  Total_Profit = 61268203.45 (MAXimum)
 
    No. Row name     St      Activity         Slack   Lower bound       Activity      Obj coef  Obj value at Limiting
                                           Marginal   Upper bound          range         range   break point variable
 ------ ------------ -- ------------- ------------- -------------  ------------- ------------- ------------- ------------
     91 Property_Max[RVP,Super_Premium]
-                    BS    -284.83796     284.83796          -Inf     -316.35568     -22.91153   1.79158e+07 Property_Max[RVI,Super_Premium]
-                                            .             .          -282.25076      49.20161   1.78953e+07 Property_Min[MON,Super_Premium]
+                    BS  -28282.05831   28282.05831          -Inf   -35422.04548     -27.09329   6.20345e+07 Property_Max[RVI,Super_Premium]
+                                            .             .        -26638.30042     207.07485   5.54117e+07 Property_Max[ARO,Super_Premium]
 
     92 Property_Max[RVI,Regular]
-                    NU        .             .               -Inf    -2.2995e+06       -.11091   1.76542e+07 blend[Regular,IC4]
-                                            .11091        .        975429.07913          +Inf   1.80175e+07 blend[Regular,RFL]
+                    NU        .             .               -Inf    -2.2995e+06       -.10870   6.10183e+07 blend[Regular,IC4]
+                                            .10870        .        975429.07913          +Inf   6.13742e+07 blend[Regular,RFL]
 
     93 Property_Max[RVI,Premium]
-                    NU        .             .               -Inf  -329457.14267       -.11091   1.78727e+07 Property_Min[E10,Premium]
-                                            .11091        .          1.6626e+06          +Inf   1.80937e+07 Property_Max[RVP,Premium]
+                    NU        .             .               -Inf  -329457.14267       -.10870   6.12324e+07 Property_Min[E10,Premium]
+                                            .10870        .          1.6626e+06          +Inf   6.14489e+07 Property_Max[RVP,Premium]
 
     94 Property_Max[RVI,Super_Premium]
-                    NU        .             .               -Inf    -1496.02942       -.48269   1.79086e+07 blend[Super_Premium,RCG]
-                                            .48269        .          9933.72439          +Inf   1.79141e+07 Component_Min_Requirement[IS1]
+                    NU        .             .               -Inf  -327172.35765       -.59127   6.10748e+07 blend[Super_Premium,IC4]
+                                            .59127        .        921110.98115          +Inf   6.18128e+07 Property_Min[E10,Super_Premium]
 
     95 Property_Max[E70,Regular]
-                    BS  -8.90002e+06   8.90002e+06          -Inf      -1.04e+07       -.16974     1.942e+07 blend[Regular,HBY]
-                                            .             .        -5.74163e+06        .09078   1.71014e+07 Property_Max[SUL,Regular]
+                    BS  -8.90002e+06   8.90002e+06          -Inf      -1.04e+07       -.16635   6.27487e+07 blend[Regular,HBY]
+                                            .             .        -5.74163e+06        .08896   6.04764e+07 Property_Max[SUL,Regular]
 
     96 Property_Max[E70,Premium]
-                    BS  -9.42603e+06   9.42603e+06          -Inf   -9.65372e+06       -.16974   1.95093e+07 blend[Premium,HBY]
-                                            .             .        -8.62914e+06        .09078   1.70536e+07 Property_Max[SUL,Premium]
+                    BS  -9.42603e+06   9.42603e+06          -Inf   -9.65372e+06       -.16635   6.28362e+07 blend[Premium,HBY]
+                                            .             .        -8.62914e+06        .08896   6.04297e+07 Property_Max[SUL,Premium]
 
     97 Property_Max[E70,Super_Premium]
-                    BS  -55096.41269   55096.41269          -Inf   -55096.41269          -Inf          +Inf
-                                            .             .        -54318.85782        .16371   1.79003e+07 Property_Min[MON,Super_Premium]
+                    BS  -4.53484e+06   4.53484e+06          -Inf   -4.53484e+06          -Inf          +Inf
+                                            .             .        -3.77904e+06        .45035   5.92259e+07 Property_Max[ARO,Super_Premium]
 
     98 Property_Max[E10,Regular]
-                    BS  -8.05392e+06   8.05392e+06          -Inf   -9.34745e+06       -.19717   1.94973e+07 Property_Max[RVI,Regular]
-                                            .             .         -7.4238e+06        .48583   1.39965e+07 blend[Regular,IS1]
+                    BS  -8.05392e+06   8.05392e+06          -Inf   -9.34745e+06       -.19323   6.28244e+07 Property_Max[RVI,Regular]
+                                            .             .         -7.4238e+06        .47611   5.74336e+07 blend[Regular,IS1]
 
     99 Property_Max[E10,Premium]
-                    BS  -1.02147e+07   1.02147e+07          -Inf      -1.04e+07       -.19717   1.99233e+07 Property_Max[RVI,Premium]
-                                            .             .        -1.25412e+06        .48583   1.29467e+07 blend[Premium,IS1]
+                    BS  -1.02147e+07   1.02147e+07          -Inf      -1.04e+07       -.19323    6.3242e+07 Property_Max[RVI,Premium]
+                                            .             .        -1.25412e+06        .47611   5.64049e+07 blend[Premium,IS1]
 
    100 Property_Max[E10,Super_Premium]
-                    BS -104000.00000  104000.00000          -Inf  -104000.00000          -Inf          +Inf
-                                            .             .       -100995.25245        .52953   1.78542e+07 Property_Min[E10,Super_Premium]
+                    BS   -1.0011e+07    1.0011e+07          -Inf    -1.0011e+07          -Inf          +Inf
+                                            .             .         -9.4682e+06        .34651   5.77993e+07 blend[Super_Premium,RCG]
 
 GLPK 4.65 - SENSITIVITY ANALYSIS REPORT                                                                         Page  11
 
 Problem:    model
-Objective:  Total_Profit = 17909285.15 (MAXimum)
+Objective:  Total_Profit = 61268203.45 (MAXimum)
 
    No. Row name     St      Activity         Slack   Lower bound       Activity      Obj coef  Obj value at Limiting
                                           Marginal   Upper bound          range         range   break point variable
 ------ ------------ -- ------------- ------------- -------------  ------------- ------------- ------------- ------------
    101 Property_Max[E15,Regular]
-                    BS  -3.99965e+11   3.99965e+11          -Inf   -3.99966e+11       -.48192   1.92769e+11 Property_Max[RVI,Regular]
-                                            .             .        -3.99965e+09        .00002   9.84533e+06 Max_Volume[Regular]
+                    BS  -3.99965e+11   3.99965e+11          -Inf   -3.99966e+11       -.47228   1.88958e+11 Property_Max[RVI,Regular]
+                                            .             .             -.00031        .00002   5.33655e+07 Max_Volume[Regular]
 
    102 Property_Max[E15,Premium]
-                    BS  -3.99967e+11   3.99967e+11          -Inf   -3.99967e+11       -.48192    1.9277e+11 Property_Max[RVI,Premium]
-                                            .             .             -.01416        .00002   8.49883e+06 Max_Volume[Premium]
+                    BS  -3.99967e+11   3.99967e+11          -Inf   -3.99967e+11       -.47228   1.88959e+11 Property_Max[RVI,Premium]
+                                            .             .             -.00189        .00003    5.1166e+07 Max_Volume[Premium]
 
    103 Property_Max[E15,Super_Premium]
-                    BS  -3.99966e+09   3.99966e+09          -Inf   -3.99966e+09          -Inf          +Inf
-                                            .             .             -.00015        .00011   1.74744e+07 Max_Volume[Super_Premium]
+                    BS  -3.99966e+11   3.99966e+11          -Inf   -3.99966e+11       -.98232   3.92956e+11 blend[Super_Premium,RCG]
+                                            .             .        -3.99966e+09        .00011   1.80049e+07 Max_Volume[Super_Premium]
 
    104 Property_Max[ARO,Regular]
-                    BS  -5.21636e+06   5.21636e+06          -Inf   -6.87664e+06       -.17269   1.88101e+07 Property_Max[SUL,Regular]
-                                            .             .        -4.20881e+06        .25313   1.65889e+07 Property_Max[RVI,Regular]
+                    BS  -5.21636e+06   5.21636e+06          -Inf   -6.87664e+06       -.16923    6.2151e+07 Property_Max[SUL,Regular]
+                                            .             .        -4.20881e+06        .24807   5.99742e+07 Property_Max[RVI,Regular]
 
    105 Property_Max[ARO,Premium]
-                    BS -656692.35106  656692.35106          -Inf    -1.0756e+06       -.17269   1.80227e+07 Property_Max[SUL,Premium]
-                                            .             .       -512336.87511        .25313   1.77431e+07 Property_Max[RVI,Premium]
+                    BS -656692.35106  656692.35106          -Inf    -1.0756e+06       -.16923   6.13793e+07 Property_Max[SUL,Premium]
+                                            .             .       -512336.87511        .24807   6.11053e+07 Property_Max[RVI,Premium]
 
    106 Property_Max[ARO,Super_Premium]
-                    BS   -3100.52594    3100.52594          -Inf    -3487.30632       -.32911   1.79103e+07 Property_Min[MON,Super_Premium]
-                                            .             .         -2445.48477       1.78680   1.79037e+07 Property_Min[RON,Super_Premium]
+                    NU        .             .               -Inf  -289381.58616      -1.17624   6.09278e+07 blend[Super_Premium,AKK]
+                                           1.17624        .        157885.16428          +Inf   6.14539e+07 Property_Min[E10,Super_Premium]
 
    107 Property_Max[BEN,Regular]
-                    BS  -53959.97445   53959.97445          -Inf  -230641.29248      -1.62274   1.79968e+07 Property_Max[SUL,Regular]
-                                            .             .        -39606.21222      17.76852   1.69505e+07 Property_Max[RVI,Regular]
+                    BS  -53959.97445   53959.97445          -Inf  -230641.29248      -1.59028    6.1354e+07 Property_Max[SUL,Regular]
+                                            .             .        -39606.21222      17.41315   6.03286e+07 Property_Max[RVI,Regular]
 
    108 Property_Max[BEN,Premium]
-                    BS  -23961.47761   23961.47761          -Inf   -68539.93142      -1.62274   1.79482e+07 Property_Max[SUL,Premium]
-                                            .             .        -21904.96355      17.76852   1.74835e+07 Property_Max[RVI,Premium]
+                    BS  -23961.47761   23961.47761          -Inf   -68539.93142      -1.59028   6.13063e+07 Property_Max[SUL,Premium]
+                                            .             .        -21904.96355      17.41315    6.0851e+07 Property_Max[RVI,Premium]
 
    109 Property_Max[BEN,Super_Premium]
-                    BS   -1824.50654    1824.50654          -Inf    -1859.80339      -3.60640   1.79159e+07 Property_Min[MON,Super_Premium]
-                                            .             .              .          238.35275   1.74744e+07 Max_Volume[Super_Premium]
+                    BS -183594.48324  183594.48324          -Inf  -187602.95233     -43.01708   6.91659e+07 blend[Super_Premium,HBY]
+                                            .             .       -164995.96083      10.11300   5.94115e+07 blend[Super_Premium,RCG]
 
    110 Property_Max[OXY,Regular]
-                    NU        .             .               -Inf  -696236.83782      -2.22700   1.63588e+07 Property_Min[E10,Regular]
-                                           2.22700        .         66136.87801          +Inf   1.80566e+07 blend[Regular,RFL]
+                    NU        .             .               -Inf  -696236.83782      -2.18246   5.97487e+07 Property_Min[E10,Regular]
+                                           2.18246        .         66136.87801          +Inf   6.14125e+07 blend[Regular,RFL]
 
 GLPK 4.65 - SENSITIVITY ANALYSIS REPORT                                                                         Page  12
 
 Problem:    model
-Objective:  Total_Profit = 17909285.15 (MAXimum)
+Objective:  Total_Profit = 61268203.45 (MAXimum)
 
    No. Row name     St      Activity         Slack   Lower bound       Activity      Obj coef  Obj value at Limiting
                                           Marginal   Upper bound          range         range   break point variable
 ------ ------------ -- ------------- ------------- -------------  ------------- ------------- ------------- ------------
    111 Property_Max[OXY,Premium]
-                    NU        .             .               -Inf   -54999.03871      -2.22700   1.77868e+07 Property_Min[E10,Premium]
-                                           2.22700        .         1.22249e+06          +Inf   2.06318e+07 blend[Premium,RFL]
+                    NU        .             .               -Inf   -54999.03871      -2.18246   6.11482e+07 Property_Min[E10,Premium]
+                                           2.18246        .         1.22249e+06          +Inf   6.39362e+07 blend[Premium,RFL]
 
    112 Property_Max[OXY,Super_Premium]
-                    NU        .             .               -Inf     -203.90469      -4.48344   1.79084e+07 blend[Super_Premium,RCG]
-                                           4.48344        .          1644.66230          +Inf   1.79167e+07 Component_Min_Requirement[IS1]
+                    NU        .             .               -Inf   -42211.79818      -6.76147   6.09828e+07 blend[Super_Premium,AKK]
+                                           6.76147        .         62329.34915          +Inf   6.16896e+07 Property_Min[E10,Super_Premium]
 
    113 Property_Max[OLEFIN,Regular]
-                    NU        .             .               -Inf  -993112.73187       -.45514   1.74573e+07 Property_Min[E70,Regular]
-                                            .45514        .        704814.60432          +Inf   1.82301e+07 blend[Regular,RFL]
+                    NU        .             .               -Inf  -993112.73187       -.44604   6.08252e+07 Property_Min[E70,Regular]
+                                            .44604        .        704814.60432          +Inf   6.15826e+07 blend[Regular,RFL]
 
    114 Property_Max[OLEFIN,Premium]
-                    NU        .             .               -Inf  -152244.76589       -.45514     1.784e+07 Property_Min[E10,Premium]
-                                            .45514        .         3.44695e+06          +Inf   1.94781e+07 Property_Max[BEN,Premium]
+                    NU        .             .               -Inf  -152244.76589       -.44604   6.12003e+07 Property_Min[E10,Premium]
+                                            .44604        .         3.44695e+06          +Inf   6.28057e+07 Property_Max[BEN,Premium]
 
    115 Property_Max[OLEFIN,Super_Premium]
-                    NU        .             .               -Inf    -2214.29060      -1.13617   1.79068e+07 blend[Super_Premium,RCG]
-                                           1.13617        .          5080.79147          +Inf   1.79151e+07 Component_Min_Requirement[IS1]
+                    NU        .             .               -Inf  -558197.94436      -1.28242   6.05524e+07 blend[Super_Premium,AKK]
+                                           1.28242        .        824227.25551          +Inf   6.23252e+07 Property_Min[E10,Super_Premium]
 
 GLPK 4.65 - SENSITIVITY ANALYSIS REPORT                                                                         Page  13
 
 Problem:    model
-Objective:  Total_Profit = 17909285.15 (MAXimum)
+Objective:  Total_Profit = 61268203.45 (MAXimum)
 
    No. Column name  St      Activity      Obj coef   Lower bound       Activity      Obj coef  Obj value at Limiting
                                           Marginal   Upper bound          range         range   break point variable
 ------ ------------ -- ------------- ------------- -------------  ------------- ------------- ------------- ------------
      1 blend[Regular,C4B]
-                    NL        .          -30.00000        .              .               -Inf   1.79093e+07 Component_Min_Requirement[C4B]
-                                         -43.07217          +Inf    12707.87065      13.07217   1.73619e+07 blend[Regular,RFL]
+                    NL        .          -29.40000        .              .               -Inf   6.12682e+07 Component_Min_Requirement[C4B]
+                                         -42.21072          +Inf    12707.87065      12.81072   6.07318e+07 blend[Regular,RFL]
 
      2 blend[Regular,IS1]
-                    NL        .          -25.00000        .           -90.61370          -Inf   1.79125e+07 Component_Min_Requirement[IS1]
-                                         -35.94682          +Inf     8516.27273      10.94682   1.76032e+07 blend[Regular,RFL]
+                    NL        .          -24.50000        .        -19271.40376          -Inf   6.19471e+07 Property_Min[E70,Regular]
+                                         -35.22788          +Inf     8516.27273      10.72788   6.09682e+07 blend[Regular,RFL]
 
      3 blend[Regular,RFL]
-                    BS    4276.91087      -5.00000        .        -31347.02358     -76.57804   1.76032e+07 blend[Regular,IS1]
-                                            .               +Inf   115264.76750      -2.41677   1.79203e+07 Property_Max[SUL,Regular]
+                    BS    4276.91087      -4.90000        .        -31347.02358     -75.04648   6.09682e+07 blend[Regular,IS1]
+                                            .               +Inf   115264.76750      -2.36843    6.1279e+07 Property_Max[SUL,Regular]
 
      4 blend[Regular,F5X]
-                    BS   46304.64744      30.00000        .         21169.11218      19.87035   1.74402e+07 blend[Regular,HBY]
-                                            .               +Inf   102436.75297      35.10773   1.81458e+07 Property_Max[SUL,Regular]
+                    BS   46304.64744      29.40000        .         21169.11218      19.47294   6.08085e+07 blend[Regular,HBY]
+                                            .               +Inf   102436.75297      34.40558      6.15e+07 Property_Max[SUL,Regular]
 
      5 blend[Regular,RCG]
-                    BS  169034.29948      10.00000        .        -25856.77845       8.30385   1.76226e+07 Property_Max[SUL,Regular]
-                                            .               +Inf   176954.57874      42.14713   2.33433e+07 blend[Regular,HBY]
+                    BS  169034.29948       9.80000        .        -25856.77845       8.13777   6.09872e+07 Property_Max[SUL,Regular]
+                                            .               +Inf   176954.57874      41.30419   6.65935e+07 blend[Regular,HBY]
 
      6 blend[Regular,IC4]
-                    BS   12520.15260      10.00000        .          -146.79678     -10.37076   1.76542e+07 Property_Max[RVI,Regular]
-                                            .               +Inf    16626.45453     120.07616   1.92875e+07 Property_Max[OLEFIN,Regular]
+                    BS   12520.15260       9.80000        .          -146.79678     -10.16335   6.10183e+07 Property_Max[RVI,Regular]
+                                            .               +Inf    16626.45453     117.67464   6.26188e+07 Property_Max[OLEFIN,Regular]
 
      7 blend[Regular,HBY]
-                    NL        .           25.00000        .              .               -Inf   1.79093e+07 Component_Min_Requirement[HBY]
-                                         -12.00539          +Inf    21208.32873      37.00539   1.76547e+07 Property_Min[E70,Regular]
+                    NL        .           24.50000        .              .               -Inf   6.12682e+07 Component_Min_Requirement[HBY]
+                                         -11.76528          +Inf    21208.32873      36.26528   6.10187e+07 Property_Min[E70,Regular]
 
      8 blend[Regular,AKK]
-                    BS  136811.66069      30.00000        .         54289.76265      -4.91313   1.31328e+07 Property_Min[RON,Regular]
-                                            .               +Inf   149585.06475      52.44567   2.09801e+07 Property_Max[SUL,Regular]
+                    BS  136811.66069      29.40000        .         54289.76265      -4.81486   5.65872e+07 Property_Min[RON,Regular]
+                                            .               +Inf   149585.06475      51.39676   6.42776e+07 Property_Max[SUL,Regular]
 
      9 blend[Regular,ETH]
-                    BS   31052.32892      25.00000        .         11034.01846     -52.45495   1.55041e+07 Property_Max[OXY,Regular]
+                    BS   31052.32892      24.50000        .         11034.01846     -51.40585   5.89111e+07 Property_Max[OXY,Regular]
                                             .               +Inf    31052.32892          +Inf          +Inf
 
     10 blend[Premium,C4B]
-                    NL        .          -20.00000        .              .               -Inf   1.79093e+07 Component_Min_Requirement[C4B]
-                                         -43.07217          +Inf    24264.38918      23.07217   1.68642e+07 blend[Premium,IC4]
+                    NL        .          -17.40000        .              .               -Inf   6.12682e+07 Component_Min_Requirement[C4B]
+                                         -42.21072          +Inf    24264.38918      24.81072    6.0244e+07 blend[Premium,IC4]
 
 GLPK 4.65 - SENSITIVITY ANALYSIS REPORT                                                                         Page  14
 
 Problem:    model
-Objective:  Total_Profit = 17909285.15 (MAXimum)
+Objective:  Total_Profit = 61268203.45 (MAXimum)
 
    No. Column name  St      Activity      Obj coef   Lower bound       Activity      Obj coef  Obj value at Limiting
                                           Marginal   Upper bound          range         range   break point variable
 ------ ------------ -- ------------- ------------- -------------  ------------- ------------- ------------- ------------
     11 blend[Premium,IS1]
-                    NL        .          -15.00000        .           -90.61370          -Inf   1.79125e+07 Component_Min_Requirement[IS1]
-                                         -35.94682          +Inf   121103.29440      20.94682    1.3556e+07 Property_Max[E70,Premium]
+                    NL        .          -12.50000        .         -2504.73457          -Inf   6.13564e+07 Property_Min[E10,Premium]
+                                         -35.22788          +Inf   121103.29440      22.72788    5.7002e+07 Property_Max[E70,Premium]
 
     12 blend[Premium,RFL]
-                    BS   79055.73406       5.00000        .         18237.10914     -66.57804   1.22506e+07 blend[Premium,IS1]
-                                            .               +Inf   107059.07418       7.58323   1.81135e+07 Property_Max[SUL,Premium]
+                    BS   79055.73406       7.10000        .         18237.10914     -63.04648   5.57227e+07 blend[Premium,IS1]
+                                            .               +Inf   107059.07418       9.63157   6.14683e+07 Property_Max[SUL,Premium]
 
     13 blend[Premium,F5X]
-                    BS   45716.57437      40.00000        .         41901.02704      29.87035   1.74462e+07 blend[Premium,HBY]
-                                            .               +Inf    59879.26288      45.10773   1.81428e+07 Property_Max[SUL,Premium]
+                    BS   45716.57437      41.40000        .         41901.02704      31.47294   6.08144e+07 blend[Premium,HBY]
+                                            .               +Inf    59879.26288      46.40558    6.1497e+07 Property_Max[SUL,Premium]
 
     14 blend[Premium,RCG]
-                    BS  167810.77944      20.00000        .        125161.74447      18.30385   1.76247e+07 Property_Max[SUL,Premium]
-                                            .               +Inf   169013.06935      52.14713   2.33039e+07 blend[Premium,HBY]
+                    BS  167810.77944      21.80000        .        125161.74447      20.13777   6.09893e+07 Property_Max[SUL,Premium]
+                                            .               +Inf   169013.06935      53.30419   6.65549e+07 blend[Premium,HBY]
 
     15 blend[Premium,IC4]
-                    BS   15556.02577      20.00000        .         13762.21943       -.37076   1.75924e+07 Property_Max[RVI,Premium]
-                                            .               +Inf    16185.52427     130.07616   1.96216e+07 Property_Max[OLEFIN,Premium]
+                    BS   15556.02577      21.80000        .         13762.21943       1.83665   6.09577e+07 Property_Max[RVI,Premium]
+                                            .               +Inf    16185.52427     129.67464   6.29463e+07 Property_Max[OLEFIN,Premium]
 
     16 blend[Premium,HBY]
-                    NL        .           35.00000        .              .               -Inf   1.79093e+07 Component_Min_Requirement[HBY]
-                                         -12.00539          +Inf     3219.40159      47.00539   1.78706e+07 Property_Min[E10,Premium]
+                    NL        .           36.50000        .              .               -Inf   6.12682e+07 Component_Min_Requirement[HBY]
+                                         -11.76528          +Inf     3219.40159      48.26528   6.12303e+07 Property_Min[E10,Premium]
 
     17 blend[Premium,AKK]
-                    BS   60808.55743      40.00000        .         54289.76265       5.08687   1.57863e+07 Property_Min[RON,Premium]
-                                            .               +Inf    64031.41432      62.44567   1.92742e+07 Property_Max[SUL,Premium]
+                    BS   60808.55743      41.40000        .         54289.76265       7.18514   5.91876e+07 Property_Min[RON,Premium]
+                                            .               +Inf    64031.41432      63.39676   6.26058e+07 Property_Max[SUL,Premium]
 
     18 blend[Premium,ETH]
-                    BS   31052.32892      35.00000        .         29470.98796     -42.45495   1.55041e+07 Property_Max[OXY,Premium]
+                    BS   31052.32892      36.50000        .         29470.98796     -39.40585   5.89111e+07 Property_Max[OXY,Premium]
                                             .               +Inf    31052.32892          +Inf          +Inf
 
     19 blend[Super_Premium,C4B]
-                    NL        .           70.00000        .              .               -Inf   1.79093e+07 Component_Min_Requirement[C4B]
-                                         -35.67113          +Inf       33.09543     105.67113   1.79081e+07 blend[Super_Premium,RCG]
+                    NL        .           72.60000        .              .               -Inf   6.12682e+07 Component_Min_Requirement[C4B]
+                                         -36.69681          +Inf     3548.23042     109.29681    6.1138e+07 blend[Super_Premium,IC4]
 
     20 blend[Super_Premium,IS1]
-                    BS      90.61370      75.00000        .            81.63631     -56.50271   1.78974e+07 blend[Super_Premium,C4B]
-                                            .               +Inf      133.24874     112.31881   1.79127e+07 Property_Min[E10,Super_Premium]
+                    BS   23616.12844      77.50000        .         22997.27188    -132.90210   5.62993e+07 blend[Super_Premium,C4B]
+                                            .               +Inf    29844.94571     107.69624   6.19813e+07 blend[Super_Premium,RCG]
 
 GLPK 4.65 - SENSITIVITY ANALYSIS REPORT                                                                         Page  15
 
 Problem:    model
-Objective:  Total_Profit = 17909285.15 (MAXimum)
+Objective:  Total_Profit = 61268203.45 (MAXimum)
 
    No. Column name  St      Activity      Obj coef   Lower bound       Activity      Obj coef  Obj value at Limiting
                                           Marginal   Upper bound          range         range   break point variable
 ------ ------------ -- ------------- ------------- -------------  ------------- ------------- ------------- ------------
     21 blend[Super_Premium,RFL]
-                    BS    2187.97626      95.00000        .              .         -103.75725   1.74744e+07 Max_Volume[Super_Premium]
-                                            .               +Inf     2208.94326     101.07118   1.79226e+07 Property_Min[MON,Super_Premium]
+                    BS  226537.21683      97.10000        .        211028.94099      84.97184   5.85207e+07 blend[Super_Premium,RCG]
+                                            .               +Inf   226537.21683          +Inf          +Inf
 
     22 blend[Super_Premium,F5X]
-                    BS     999.07014     130.00000        .           971.70069      38.07998   1.78175e+07 Property_Max[OLEFIN,Super_Premium]
-                                            .               +Inf     1010.16887     141.46928   1.79207e+07 Property_Min[MON,Super_Premium]
+                    BS  100941.03526     131.40000        .         94666.88499     101.42194   5.82422e+07 blend[Super_Premium,RCG]
+                                            .               +Inf   101003.97782    5539.20209   6.07137e+08 Property_Max[ARO,Super_Premium]
 
     23 blend[Super_Premium,RCG]
-                    BS      33.38376     110.00000        .          -307.10910     106.18693   1.79092e+07 Property_Min[MON,Super_Premium]
-                                            .               +Inf       33.38376          +Inf          +Inf
+                    NL        .          111.80000        .        -13627.37096          -Inf    6.1403e+07 Property_Min[E10,Super_Premium]
+                                          -9.89093          +Inf    19016.10013     121.69093   6.10801e+07 blend[Super_Premium,AKK]
 
     24 blend[Super_Premium,IC4]
-                    BS      23.90342     110.00000        .              .63514      59.26349   1.79081e+07 blend[Super_Premium,C4B]
-                                            .               +Inf       25.77397    1454.95069   1.79414e+07 Property_Max[OLEFIN,Super_Premium]
+                    BS    2299.53363     111.80000        .        -12497.49973      55.17603    6.1138e+07 blend[Super_Premium,C4B]
+                                            .               +Inf     2889.93669     430.37364   6.20008e+07 blend[Super_Premium,RCG]
 
     25 blend[Super_Premium,HBY]
-                    NL        .          125.00000        .              .               -Inf   1.79093e+07 Component_Min_Requirement[HBY]
-                                         -50.07415          +Inf       14.80008     175.07415   1.79085e+07 blend[Super_Premium,RCG]
+                    NL        .          126.50000        .              .               -Inf   6.12682e+07 Component_Min_Requirement[HBY]
+                                         -52.58073          +Inf     3279.38785     179.08073   6.10958e+07 blend[Super_Premium,IC4]
 
     26 blend[Super_Premium,AKK]
-                    BS     182.01650     130.00000        .           158.81666      79.55024   1.79001e+07 Property_Min[RON,Super_Premium]
-                                            .               +Inf      183.71456     204.96430   1.79229e+07 Property_Min[MON,Super_Premium]
+                    BS    4052.89435     131.40000        .        -20101.32749      84.99197   6.10801e+07 blend[Super_Premium,RCG]
+                                            .               +Inf     4052.89435          +Inf          +Inf
 
     27 blend[Super_Premium,ETH]
-                    BS     483.03623     125.00000        .           477.17353     -30.93418    1.7834e+07 Property_Max[OXY,Super_Premium]
-                                            .               +Inf      483.03623          +Inf          +Inf
+                    BS   42553.19149     126.50000        .         41339.51127    -108.66407   5.12612e+07 Property_Max[OXY,Super_Premium]
+                                            .               +Inf    42553.19149          +Inf          +Inf
 
 End of report
