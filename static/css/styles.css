@@ -1,0 +1,346 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.spec-input-width {
+    width: 80px;
+    min-width: 60px;
+}
+
+h1, h2 {
+    color: #1f2937;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+table {
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+    width: 100%;
+}
+
+#grades-table {
+    max-width: 700px;
+    width: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+th, td {
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+    text-align: left;
+    white-space: nowrap;
+}
+
+th {
+    background-color: #e0e7ff;
+    font-weight: 600;
+    color: #374151;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+th.text-center {
+    text-align: center;
+}
+
+td {
+    background-color: #ffffff;
+}
+
+input[type="text"] {
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    text-align: right;
+    width: 100%;
+}
+
+input[type="text"]:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
+    outline: none;
+}
+
+.input-half-width {
+    width: 70px;
+    min-width: 60px;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.btn-primary {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background-color: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.solver-choice {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.solver-choice label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.solver-choice input[type="radio"]:checked + span {
+    color: #2563eb;
+    font-weight: 700;
+}
+
+.solver-choice input[type="radio"]:checked {
+    accent-color: #2563eb;
+}
+
+.solver-choice label:hover {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
+}
+
+.input-with-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-grow: 1;
+    width: 100%;
+}
+
+.control-btn {
+    background-color: #e0e7ff;
+    color: #2563eb;
+    border: 1px solid #a7b4f5;
+    border-radius: 6px;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    font-weight: bold;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.control-btn:hover {
+    background-color: #c7d2fe;
+    border-color: #8b9dff;
+}
+
+.control-btn:active {
+    background-color: #a5b4fc;
+}
+
+.numeric-input {
+    text-align: right;
+    -moz-appearance: textfield;
+}
+
+.numeric-input::-webkit-outer-spin-button,
+.numeric-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Resizable input container for component table only */
+.resizable-input-container {
+    position: relative;
+    display: inline-block;
+    min-width: 60px;
+}
+
+.resizable-input {
+    width: 100%;
+    resize: none;
+    padding-right: 15px; /* Space for resize handle */
+}
+
+.resize-handle {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 12px;
+    cursor: ew-resize;
+    background: linear-gradient(90deg, transparent 0%, #cbd5e1 40%, #94a3b8 60%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.2s;
+    border-radius: 0 6px 6px 0;
+}
+
+.resizable-input-container:hover .resize-handle {
+    opacity: 0.7;
+}
+
+.resize-handle:hover {
+    opacity: 1 !important;
+    background: linear-gradient(90deg, transparent 0%, #64748b 40%, #475569 60%, transparent 100%);
+}
+
+.resize-handle.dragging {
+    opacity: 1 !important;
+    background: linear-gradient(90deg, transparent 0%, #3b82f6 40%, #2563eb 60%, transparent 100%);
+}
+
+.component-table-wrapper {
+    overflow-x: auto;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    border: 2px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.component-table-wrapper table {
+    min-width: 1000px;
+    width: auto;
+}
+
+#specs-table {
+    width: 100%;
+    min-width: 0;
+}
+
+.header-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.datetime-stamp {
+    font-size: 0.9rem;
+    color: #6b7280;
+    text-align: right;
+}
+
+.header-images {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.header-images img {
+    max-width: 100px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header-info h1 {
+    flex-grow: 1;
+    text-align: center;
+    margin: 0;
+}
+
+@media (min-width: 768px) {
+    .header-info {
+        flex-wrap: nowrap;
+    }
+    .header-images {
+        width: auto;
+        margin-bottom: 0;
+    }
+    .header-info h1 {
+        text-align: left;
+    }
+}
+
+#messageBox {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    z-index: 1001;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+#messageBox.show {
+    opacity: 1;
+}
+/* Make resize handles visible and working */
+.resize-handle {
+    background: rgba(96, 165, 250, 0.3) !important;
+    opacity: 1 !important;
+    width: 8px !important;
+    cursor: col-resize !important;
+}
+
+.resize-handle:hover {
+    background: rgba(96, 165, 250, 0.6) !important;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6;
+    color: #333;
+    /* This is the key change to add the GIF background */
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/b/bd/Flapping_bird_animation_in_16_frames.gif');
+    background-size: cover; /* This makes the GIF cover the entire background */
+    background-attachment: fixed; /* This keeps the GIF in place as the user scrolls */
+    background-position: center; /* This centers the GIF in the background */
+}
+body {
+    background-image: url('/static/images/birds.gif');
+    background-repeat: repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+}

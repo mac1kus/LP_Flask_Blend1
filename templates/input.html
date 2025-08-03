@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gasoline Blending Optimization</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body class="p-4">
+    <div id="messageBox"></div>
+    <div class="container">
+        <!-- New button to play African music, aligned to the right -->
+        <div class="flex justify-end mb-4">
+            <button id="playMusicButton" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                Play African Music 🎵
+            </button>
+            <audio id="africanMusic"></audio>
+        </div>
+
+        <div class="header-info">
+            <div class="header-images">
+                <img src="/static/images/aliko.jpg" alt="Aliko Dangote Refinery" onerror="this.onerror=null;this.src='https://placehold.co/100x100/E0E7FF/374151?text=Aliko';" class="w-24 h-24 object-cover rounded-full">
+                <img src="/static/images/refinery.jpg" alt="Oil Refinery" onerror="this.onerror=null;this.src='https://placehold.co/100x100/E0E7FF/374151?text=Refinery';" class="w-24 h-24 object-cover rounded-full cursor-pointer hover:opacity-80" onclick="showMessage('Largest refinery in the world', 'info')">
+                <img src="/static/images/birds.gif" alt="A flying bird">
+            </div>
+            <h1 class="text-4xl text-center">Gasoline Blending Optimization</h1>
+            <div class="datetime-stamp">
+                <p>Date: <span id="currentDate"></span></p>
+                <p>Time: <span id="currentTime"></span></p>
+            </div>
+        </div>
+
+        <form action="/run_lp" method="post">
+            <div class="form-group solver-choice">
+                <label>
+                    <input type="radio" name="solver_choice" value="CBC" checked>
+                    <span>CBC Solver</span>
+                </label>
+                <label>
+                    <input type="radio" name="solver_choice" value="GLPK">
+                    <span>GLPK Solver</span>
+                </label>
+            </div>
+
+            <h2 class="text-2xl">Gasoline Grades</h2>
+            <table id="grades-table">
+                <thead>
+                    <tr>
+                        <th class="text-center">Grade</th>
+                        <th class="text-center">Min Production (bbl)</th>
+                        <th class="text-center">Max Production (bbl)</th>
+                        <th class="text-center">Selling Price ($/bbl)</th>
+                    </tr>
+                </thead>
+                <tbody id="grades-tbody">
+                    {% for grade in grades %}
+                    <tr>
+                        <td class="font-medium">{{ grade.name }}</td>
+                        <td><input type="text" name="grade_{{ grade.name }}_min" value="{{ grade.min }}" class="numeric-input"></td>
+                        <td><input type="text" name="grade_{{ grade.name }}_max" value="{{ grade.max }}" class="numeric-input"></td>
+                        <td><input type="text" name="grade_{{ grade.name }}_price" value="{{ grade.price }}" class="numeric-input"></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h2 class="text-2xl">Component Properties</h2>
+            <div class="component-table-wrapper">
+                <table id="components-table">
+                    <thead>
+                        <tr>
+                            <th class="text-center">TAG</th>
+                            <th class="text-center">Component Name</th>
+                            <th class="text-center">Min Comp</th>
+                            <th class="text-center">Availability</th>
+                            <th class="text-center">Factor</th>
+                            <th class="text-center">Cost</th>
+                            {% for prop in properties %}
+                            <th class="text-center">{{ prop }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody id="components-tbody">
+                        {% for comp in components %}
+                        <tr>
+                            <td>{{ comp.name}}</td>
+                            <td>{{ comp.tag}}</td>
+                            <td><input type="text" name="component_{{ comp.name }}_min_comp" value="{{ comp.min_comp }}" class="resizable-component-input numeric-input"></td>
+                            <td><input type="text" name="component_{{ comp.name }}_availability" value="{{ comp.availability }}" class="resizable-component-input numeric-input"></td>
+                            <td><input type="text" name="component_{{ comp.name }}_factor" value="{{ comp.factor }}" class="resizable-component-input numeric-input"></td>
+                            <td><input type="text" name="component_{{ comp.name }}_cost" value="{{ '%.2f' | format(comp.display_cost) }}" class="resizable-component-input numeric-input"></td>
+                            {% for prop in properties %}
+                            <td><input type="text" name="component_{{ comp.name }}_property_{{ prop }}" value="{{ comp.properties[prop] }}" class="resizable-component-input numeric-input"></td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <h2 class="text-2xl">Specifications</h2>
+            <table id="specs-table">
+                <thead id="specs-thead">
+                    <tr>
+                        <th class="text-center" rowspan="2">Property</th>
+                        {% for grade in grades %}
+                        <th class="text-center" colspan="2">{{ grade.name }}</th>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        {% for grade in grades %}
+                        <th class="text-center">Min</th>
+                        <th class="text-center">Max</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody id="specs-tbody">
+                    {% for prop in properties %}
+                    <tr>
+                        <td class="font-medium">{{ prop }}</td>
+                        {% for grade in grades %}
+                        <td><input type="text" name="spec_{{ prop }}_{{ grade.name }}_min" value="{{ specs[prop][grade.name].min if specs[prop][grade.name].min != 0 else '' }}" class="spec-input-width numeric-input"></td>
+                        <td><input type="text" name="spec_{{ prop }}_{{ grade.name }}_max" value="{{ 'inf' if specs[prop][grade.name].max > 1e12 else specs[prop][grade.name].max }}" class="spec-input-width numeric-input"></td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="text-center">
+                <button type="submit" class="btn-primary">Run Optimization</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Make sure to link to your main.js file here! -->
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
