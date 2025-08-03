@@ -445,7 +445,7 @@ def run_optimization(grades_data, components_data, properties_list, specs_data, 
         try:
             solver = GLPK_CMD(msg=0, path=GLPSOL_PATH)
             model.solve(solver)
-        except (pulp.PulpSolverError, FileNotFoundError) as e:
+        except FileNotFoundError as e:
             solver_used = "CBC (Fallback)"
             model.solve(PULP_CBC_CMD(msg=0))
     else: 
