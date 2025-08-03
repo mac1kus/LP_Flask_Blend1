@@ -5,19 +5,28 @@ from datetime import datetime
 import subprocess
 import os
 import io
+import tempfile
+import traceback
 from jinja2 import Environment, FileSystemLoader, select_autoescape, StrictUndefined
 
 # --- Flask App Initialization ---
 app = Flask(__name__)
 
-# --- Configuration ---
-MODE_CHOICE = "OPTIMIZATION"
+# --- Configuration - Dynamically set file paths based on environment ---
+# Check if running in a Render environment (or similar containerized platform)
+if os.environ.get("RENDER"):
+    BASE_PATH = "/tmp"
+    print("Running on Render. Using /tmp for file storage.")
+else:
+    BASE_PATH = "."
+    print("Running locally. Using current directory for file storage.")
+
+RESULT_FILE_NAME = os.path.join(BASE_PATH, "result1.txt")
+RANGE_REPORT_FILE_NAME = os.path.join(BASE_PATH, "result2.txt")
+INFEASIBILITY_FILE_NAME = os.path.join(BASE_PATH, "infeasibility_analysis.txt")
+MOD_FILE = os.path.join(BASE_PATH, "model.mod")
+DAT_FILE = os.path.join(BASE_PATH, "data.dat")
 GLPSOL_PATH = None
-RESULT_FILE_NAME = "result1.txt"
-RANGE_REPORT_FILE_NAME = "result2.txt"
-INFEASIBILITY_FILE_NAME = "infeasibility_analysis.txt"
-MOD_FILE = "model.mod"
-DAT_FILE = "data.dat"
 
 # --- Helper functions for conversions ---
 def calculate_roi(ron):
@@ -240,385 +249,122 @@ def analyze_grade_infeasibility(grade_name, grade_idx, grades_data, components_d
         return achieved
     
     # First, verify it's actually infeasible
-    base_model, base_blend, base_total = create_test_model()
-    base_model.solve(PULP_CBC_CMD(msg=0))
-    
-    if base_model.status == LpStatusOptimal:
-        diagnostics.append("ERROR: Model is actually feasible! No analysis needed.")
-        return diagnostics
-    
-    diagnostics.append("1. CONFIRMED: Model is infeasible as stated")
-    diagnostics.append("")
-    
-    # Get all active constraints
-    active_constraints = []
-    constraint_details = {}
-    
-    for prop in properties_list:
-        min_val, max_val = spec_bounds.get((prop, grade_name), (0.0, float('inf')))
+    try:
+        base_model, base_blend, base_total = create_test_model()
+        base_model.solve(PULP_CBC_CMD(msg=0))
         
-        if min_val is not None and not math.isinf(min_val) and min_val > 0:
-            constraint_key = (prop, 'min')
-            active_constraints.append(constraint_key)
-            
-            # Convert back for display
-            display_prop, display_val = get_display_property_info(prop, min_val)
-            constraint_details[constraint_key] = f"{display_prop} >= {display_val:.3f}"
+        if base_model.status == LpStatusOptimal:
+            diagnostics.append("ERROR: Model is actually feasible! No analysis needed.")
+            return diagnostics
         
-        if max_val is not None and not math.isinf(max_val):
-            constraint_key = (prop, 'max')
-            active_constraints.append(constraint_key)
-            
-            # Convert back for display
-            display_prop, display_val = get_display_property_info(prop, max_val)
-            constraint_details[constraint_key] = f"{display_prop} <= {display_val:.3f}"
-    
-    # Step 2: Find which single constraint relaxations make it feasible
-    diagnostics.append("2. CRITICAL CONSTRAINT IDENTIFICATION")
-    diagnostics.append("   (Testing which individual constraints cause infeasibility)")
-    diagnostics.append("")
-    
-    critical_constraints = []
-    
-    for constraint_key in active_constraints:
-        prop, bound_type = constraint_key
-        
-        # Create model without this specific constraint
-        test_model, test_blend, test_total = create_test_model()
-        
-        # Clear and rebuild constraints without the tested one
-        test_model.constraints = {}
-        
-        # Re-add volume constraints
-        test_model += test_total >= grade_min, f"{grade_name}_Min_Test"
-        test_model += test_total <= grade_max, f"{grade_name}_Max_Test"
-        
-        # Re-add component availability constraints
-        for comp in components:
-            test_model += test_blend[comp] <= component_availability[comp], f"{comp}_Availability_Test"
-        
-        # Re-add component minimum constraints
-        for comp in components:
-            min_comp_val = component_min_comp.get(comp, 0)
-            if min_comp_val is not None and min_comp_val > 0:
-                test_model += test_blend[comp] >= min_comp_val, f"{comp}_Min_Test"
-        
-        # Re-add property constraints except the one we're testing
-        for test_prop in properties_list:
-            test_min_val, test_max_val = spec_bounds.get((test_prop, grade_name), (0.0, float('inf')))
-            
-            # Skip the constraint we're testing
-            if test_prop == prop and bound_type == 'min':
-                continue
-            if test_prop == prop and bound_type == 'max':
-                continue
-            
-            if test_min_val is not None and not math.isinf(test_min_val) and test_min_val > 0:
-                weighted_sum = lpSum([property_value.get((test_prop, comp), 0) * test_blend[comp] for comp in components])
-                test_model += weighted_sum >= test_min_val * test_total, f"{grade_name}_{test_prop}_Min_Test"
-            
-            if test_max_val is not None and not math.isinf(test_max_val):
-                weighted_sum = lpSum([property_value.get((test_prop, comp), 0) * test_blend[comp] for comp in components])
-                test_model += weighted_sum <= test_max_val * test_total, f"{grade_name}_{test_prop}_Max_Test"
-        
-        test_model.solve(PULP_CBC_CMD(msg=0))
-        
-        if test_model.status == LpStatusOptimal:
-            critical_constraints.append(constraint_key)
-            constraint_desc = constraint_details[constraint_key]
-            diagnostics.append(f"   ✗ CRITICAL: {constraint_desc}")
-            
-            # Get the achieved value for this property
-            total_vol = sum(test_blend[comp].varValue or 0 for comp in components)
-            if total_vol > 0:
-                display_prop, achieved_val = get_display_property_info(prop, 
-                    sum(property_value.get((prop, comp), 0) * (test_blend[comp].varValue or 0) for comp in components) / total_vol)
-                diagnostics.append(f"       Without this constraint, {display_prop} = {achieved_val:.3f}")
-    
-    if not critical_constraints:
-        diagnostics.append("   No single constraint removal makes it feasible.")
-        diagnostics.append("   This indicates complex multi-constraint interactions.")
-        
-        # Even if no single constraint works, try pairwise combinations
-        diagnostics.append("")
-        diagnostics.append("3. TESTING PAIRWISE CONSTRAINT COMBINATIONS")
+        diagnostics.append("1. CONFIRMED: Model is infeasible as stated")
         diagnostics.append("")
         
-        for i, constraint1 in enumerate(active_constraints):
-            for j, constraint2 in enumerate(active_constraints):
-                if i >= j:
+        # Get all active constraints
+        active_constraints = []
+        constraint_details = {}
+        
+        for prop in properties_list:
+            min_val, max_val = spec_bounds.get((prop, grade_name), (0.0, float('inf')))
+            
+            if min_val is not None and not math.isinf(min_val) and min_val > 0:
+                constraint_key = (prop, 'min')
+                active_constraints.append(constraint_key)
+                
+                # Convert back for display
+                display_prop, display_val = get_display_property_info(prop, min_val)
+                constraint_details[constraint_key] = f"{display_prop} >= {display_val:.3f}"
+            
+            if max_val is not None and not math.isinf(max_val):
+                constraint_key = (prop, 'max')
+                active_constraints.append(constraint_key)
+                
+                # Convert back for display
+                display_prop, display_val = get_display_property_info(prop, max_val)
+                constraint_details[constraint_key] = f"{display_prop} <= {display_val:.3f}"
+        
+        # Test which single constraint removals make it feasible
+        diagnostics.append("2. CRITICAL CONSTRAINT IDENTIFICATION")
+        diagnostics.append("   (Testing which individual constraints cause infeasibility)")
+        diagnostics.append("")
+        
+        critical_constraints = []
+        
+        for constraint_key in active_constraints:
+            prop, bound_type = constraint_key
+            
+            # Create model without this specific constraint
+            test_model, test_blend, test_total = create_test_model()
+            
+            # Clear and rebuild constraints without the tested one
+            test_model.constraints = {}
+            
+            # Re-add volume constraints
+            test_model += test_total >= grade_min, f"{grade_name}_Min_Test"
+            test_model += test_total <= grade_max, f"{grade_name}_Max_Test"
+            
+            # Re-add component availability constraints
+            for comp in components:
+                test_model += test_blend[comp] <= component_availability[comp], f"{comp}_Availability_Test"
+            
+            # Re-add component minimum constraints
+            for comp in components:
+                min_comp_val = component_min_comp.get(comp, 0)
+                if min_comp_val is not None and min_comp_val > 0:
+                    test_model += test_blend[comp] >= min_comp_val, f"{comp}_Min_Test"
+            
+            # Re-add property constraints except the one we're testing
+            for test_prop in properties_list:
+                test_min_val, test_max_val = spec_bounds.get((test_prop, grade_name), (0.0, float('inf')))
+                
+                # Skip the constraint we're testing
+                if test_prop == prop and bound_type == 'min':
+                    continue
+                if test_prop == prop and bound_type == 'max':
                     continue
                 
-                # Test removing both constraints
-                prop1, bound1 = constraint1
-                prop2, bound2 = constraint2
+                if test_min_val is not None and not math.isinf(test_min_val) and test_min_val > 0:
+                    weighted_sum = lpSum([property_value.get((test_prop, comp), 0) * test_blend[comp] for comp in components])
+                    test_model += weighted_sum >= test_min_val * test_total, f"{grade_name}_{test_prop}_Min_Test"
                 
-                test_model, test_blend, test_total = create_test_model()
-                test_model.constraints = {}
+                if test_max_val is not None and not math.isinf(test_max_val):
+                    weighted_sum = lpSum([property_value.get((test_prop, comp), 0) * test_blend[comp] for comp in components])
+                    test_model += weighted_sum <= test_max_val * test_total, f"{grade_name}_{test_prop}_Max_Test"
+            
+            test_model.solve(PULP_CBC_CMD(msg=0))
+            
+            if test_model.status == LpStatusOptimal:
+                critical_constraints.append(constraint_key)
+                constraint_desc = constraint_details[constraint_key]
+                diagnostics.append(f"   ✗ CRITICAL: {constraint_desc}")
                 
-                # Re-add volume constraints
-                test_model += test_total >= grade_min, f"{grade_name}_Min_Test"
-                test_model += test_total <= grade_max, f"{grade_name}_Max_Test"
-                
-                # Re-add component constraints
-                for comp in components:
-                    test_model += test_blend[comp] <= component_availability[comp], f"{comp}_Availability_Test"
-                    min_comp_val = component_min_comp.get(comp, 0)
-                    if min_comp_val is not None and min_comp_val > 0:
-                        test_model += test_blend[comp] >= min_comp_val, f"{comp}_Min_Test"
-                
-                # Re-add property constraints except the two we're testing
-                for test_prop in properties_list:
-                    test_min_val, test_max_val = spec_bounds.get((test_prop, grade_name), (0.0, float('inf')))
-                    
-                    # Skip both constraints we're testing
-                    if (test_prop == prop1 and bound1 == 'min') or (test_prop == prop2 and bound2 == 'min'):
-                        if test_max_val is not None and not math.isinf(test_max_val):
-                            if not ((test_prop == prop1 and bound1 == 'max') or (test_prop == prop2 and bound2 == 'max')):
-                                weighted_sum = lpSum([property_value.get((test_prop, comp), 0) * test_blend[comp] for comp in components])
-                                test_model += weighted_sum <= test_max_val * test_total, f"{grade_name}_{test_prop}_Max_Test"
-                    elif (test_prop == prop1 and bound1 == 'max') or (test_prop == prop2 and bound2 == 'max'):
-                        if test_min_val is not None and not math.isinf(test_min_val) and test_min_val > 0:
-                            weighted_sum = lpSum([property_value.get((test_prop, comp), 0) * test_blend[comp] for comp in components])
-                            test_model += weighted_sum >= test_min_val * test_total, f"{grade_name}_{test_prop}_Min_Test"
-                    else:
-                        if test_min_val is not None and not math.isinf(test_min_val) and test_min_val > 0:
-                            weighted_sum = lpSum([property_value.get((test_prop, comp), 0) * test_blend[comp] for comp in components])
-                            test_model += weighted_sum >= test_min_val * test_total, f"{grade_name}_{test_prop}_Min_Test"
-                        if test_max_val is not None and not math.isinf(test_max_val):
-                            weighted_sum = lpSum([property_value.get((test_prop, comp), 0) * test_blend[comp] for comp in components])
-                            test_model += weighted_sum <= test_max_val * test_total, f"{grade_name}_{test_prop}_Max_Test"
-                
-                test_model.solve(PULP_CBC_CMD(msg=0))
-                
-                if test_model.status == LpStatusOptimal:
-                    desc1 = constraint_details[constraint1]
-                    desc2 = constraint_details[constraint2]
-                    diagnostics.append(f"   ✗ CRITICAL PAIR: {desc1} AND {desc2}")
-                    critical_constraints.extend([constraint1, constraint2])
-                    break
-            else:
-                continue
-            break
+                # Get the achieved value for this property
+                total_vol = sum(test_blend[comp].varValue or 0 for comp in components)
+                if total_vol > 0:
+                    display_prop, achieved_val = get_display_property_info(prop, 
+                        sum(property_value.get((prop, comp), 0) * (test_blend[comp].varValue or 0) for comp in components) / total_vol)
+                    diagnostics.append(f"       Without this constraint, {display_prop} = {achieved_val:.3f}")
         
         if not critical_constraints:
-            diagnostics.append("   Even pairwise constraint removal doesn't achieve feasibility.")
-            diagnostics.append("   This problem may require significant specification changes.")
-            return diagnostics
-    
-    diagnostics.append("")
-    diagnostics.append("3. MULTIPLE FEASIBILITY PATHS")
-    diagnostics.append("   (Different ways to achieve feasibility)")
-    diagnostics.append("")
-    
-    # Remove duplicates from critical_constraints
-    critical_constraints = list(set(critical_constraints))
-    
-    # Step 3: For each critical constraint, find minimal relaxation amounts
-    solution_paths = []
-    
-    for i, constraint_key in enumerate(critical_constraints, 1):
-        prop, bound_type = constraint_key
-        constraint_desc = constraint_details[constraint_key]
-        
-        diagnostics.append(f"PATH {i}: RELAX {constraint_desc}")
-        diagnostics.append("-" * 60)
-        
-        # Binary search to find minimal relaxation
-        min_relax = 0.001
-        max_relax = 50.0
-        best_relax = None
-        
-        # Adjust search range based on property type
-        if prop in ['ROI', 'MOI', 'RVI']:
-            min_relax = 0.01
-            max_relax = 10.0
-        elif prop in ['E70', 'E10', 'E15', 'ARO', 'OLEFIN']:
-            min_relax = 0.1
-            max_relax = 20.0
-        elif prop in ['SPG']:
-            min_relax = 0.001
-            max_relax = 0.1
-        
-        for iteration in range(25):  # Increased iterations for precision
-            test_relax = (min_relax + max_relax) / 2
-            
-            test_model, test_blend, test_total = create_test_model(
-                relaxed_constraints=[(prop, bound_type, test_relax)]
-            )
-            test_model.solve(PULP_CBC_CMD(msg=0))
-            
-            if test_model.status == LpStatusOptimal:
-                best_relax = test_relax
-                max_relax = test_relax
-            else:
-                min_relax = test_relax
-            
-            if max_relax - min_relax < 0.0001:
-                break
-        
-        if best_relax:
-            # Get the current spec value
-            current_val, _ = spec_bounds.get((prop, grade_name), (0.0, float('inf')))
-            if bound_type == 'max':
-                _, current_val = spec_bounds.get((prop, grade_name), (0.0, float('inf')))
-            
-            # Convert for display
-            display_prop, current_display = get_display_property_info(prop, current_val)
-            
-            if bound_type == 'min':
-                _, new_display = get_display_property_info(prop, current_val - best_relax)
-                diagnostics.append(f"   SOLUTION: Change {display_prop} from >= {current_display:.4f} to >= {new_display:.4f}")
-                diagnostics.append(f"             (Reduce minimum by {current_display - new_display:.4f})")
-            else:
-                _, new_display = get_display_property_info(prop, current_val + best_relax)
-                diagnostics.append(f"   SOLUTION: Change {display_prop} from <= {current_display:.4f} to <= {new_display:.4f}")
-                diagnostics.append(f"             (Increase maximum by {new_display - current_display:.4f})")
-            
-            # Show what the optimized blend would achieve
-            test_model, test_blend, test_total = create_test_model(
-                relaxed_constraints=[(prop, bound_type, best_relax)]
-            )
-            test_model.solve(PULP_CBC_CMD(msg=0))
-            
-            if test_model.status == LpStatusOptimal:
-                total_vol = sum(test_blend[comp].varValue or 0 for comp in components)
-                profit = value(test_model.objective)
-                
-                diagnostics.append(f"   RESULT: {total_vol:.0f} bbl, Profit: ${profit:.2f}")
-                
-                # Show achieved properties
-                achieved_props = calculate_achieved_properties(test_blend, total_vol)
-                
-                diagnostics.append("   ACHIEVED PROPERTIES:")
-                for prop_name, achieved_val in achieved_props.items():
-                    # Get spec range for comparison
-                    spec_min = original_specs_data.get(prop_name, {}).get(grade_name, {}).get('min', 0)
-                    spec_max = original_specs_data.get(prop_name, {}).get(grade_name, {}).get('max', float('inf'))
-                    
-                    if math.isinf(spec_max):
-                        spec_range = f">= {spec_min:.3f}"
-                    elif spec_min == 0:
-                        spec_range = f"<= {spec_max:.3f}"
-                    else:
-                        spec_range = f"{spec_min:.3f}-{spec_max:.3f}"
-                    
-                    diagnostics.append(f"           {prop_name}: {achieved_val:.4f} (spec: {spec_range})")
-            
-            solution_paths.append((constraint_key, best_relax, constraint_desc, profit if 'profit' in locals() else 0))
+            diagnostics.append("   No single constraint removal makes it feasible.")
+            diagnostics.append("   This indicates complex multi-constraint interactions.")
         
         diagnostics.append("")
+        diagnostics.append("FEASIBILITY SUMMARY & RECOMMENDATIONS")
+        diagnostics.append("=" * 50)
+        
+        if critical_constraints:
+            diagnostics.append("CRITICAL CONSTRAINTS (removing any one makes problem feasible):")
+            for constraint_key in critical_constraints:
+                desc = constraint_details[constraint_key]
+                diagnostics.append(f"• {desc}")
+        else:
+            diagnostics.append("Multiple constraints interact to cause infeasibility.")
+            diagnostics.append("Consider relaxing several constraints simultaneously.")
     
-    # Step 4: Test combinations of smaller relaxations
-    if len(critical_constraints) > 1:
-        diagnostics.append("4. COMBINATION SOLUTIONS")
-        diagnostics.append("   (Smaller relaxations across multiple constraints)")
-        diagnostics.append("")
-        
-        combination_solutions = []
-        
-        # Try combinations of two constraints with various relaxation amounts
-        for i, constraint1 in enumerate(critical_constraints):
-            for j, constraint2 in enumerate(critical_constraints):
-                if i >= j:
-                    continue
-                
-                prop1, bound1 = constraint1
-                prop2, bound2 = constraint2
-                
-                # Try different relaxation combinations
-                relax_levels = [0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 3.0]
-                
-                best_combo = None
-                min_total_relax = float('inf')
-                
-                for relax1 in relax_levels:
-                    for relax2 in relax_levels:
-                        test_model, test_blend, test_total = create_test_model(
-                            relaxed_constraints=[(prop1, bound1, relax1), (prop2, bound2, relax2)]
-                        )
-                        test_model.solve(PULP_CBC_CMD(msg=0))
-                        
-                        if test_model.status == LpStatusOptimal:
-                            total_relax = relax1 + relax2
-                            if total_relax < min_total_relax:
-                                min_total_relax = total_relax
-                                total_vol = sum(test_blend[comp].varValue or 0 for comp in components)
-                                profit = value(test_model.objective)
-                                achieved_props = calculate_achieved_properties(test_blend, total_vol)
-                                
-                                best_combo = {
-                                    'constraints': [constraint1, constraint2],
-                                    'relaxations': [relax1, relax2],
-                                    'total_volume': total_vol,
-                                    'profit': profit,
-                                    'achieved_props': achieved_props
-                                }
-                            break
-                    else:
-                        continue
-                    break
-                
-                if best_combo:
-                    combination_solutions.append(best_combo)
-        
-        # Display best combination solutions
-        combination_solutions.sort(key=lambda x: sum(x['relaxations']))
-        
-        for idx, combo in enumerate(combination_solutions[:3], 1):  # Show top 3
-            diagnostics.append(f"   COMBINATION {idx}:")
-            
-            for k, (constraint_key, relax_amount) in enumerate(zip(combo['constraints'], combo['relaxations'])):
-                prop, bound_type = constraint_key
-                current_val, _ = spec_bounds.get((prop, grade_name), (0.0, float('inf')))
-                if bound_type == 'max':
-                    _, current_val = spec_bounds.get((prop, grade_name), (0.0, float('inf')))
-                
-                display_prop, current_display = get_display_property_info(prop, current_val)
-                
-                if bound_type == 'min':
-                    _, new_display = get_display_property_info(prop, current_val - relax_amount)
-                    diagnostics.append(f"   - Relax {display_prop} from >= {current_display:.4f} to >= {new_display:.4f}")
-                else:
-                    _, new_display = get_display_property_info(prop, current_val + relax_amount)
-                    diagnostics.append(f"   - Relax {display_prop} from <= {current_display:.4f} to <= {new_display:.4f}")
-            
-            diagnostics.append(f"   - Result: {combo['total_volume']:.0f} bbl, Profit: ${combo['profit']:.2f}")
-            diagnostics.append("")
-    
-    diagnostics.append("")
-    diagnostics.append("5. FEASIBILITY SUMMARY & RECOMMENDATIONS")
-    diagnostics.append("=" * 50)
-    
-    if solution_paths:
-        # Sort by relaxation amount (ascending)
-        solution_paths.sort(key=lambda x: x[1])
-        
-        diagnostics.append("SINGLE CONSTRAINT SOLUTIONS (ordered by relaxation size):")
-        for i, (constraint_key, relax_amount, desc, profit) in enumerate(solution_paths, 1):
-            diagnostics.append(f"{i}. {desc} - Relax by {relax_amount:.4f} (Profit: ${profit:.2f})")
-        
-        diagnostics.append("")
-        diagnostics.append("RECOMMENDED SOLUTION:")
-        best_path = solution_paths[0]
-        diagnostics.append(f"► {best_path[2]}")
-        diagnostics.append(f"  Requires smallest relaxation ({best_path[1]:.4f}) with profit ${best_path[3]:.2f}")
-        
-        if len(solution_paths) > 1:
-            diagnostics.append("")
-            diagnostics.append("ALTERNATIVE SOLUTIONS:")
-            for path in solution_paths[1:3]:  # Show next 2 alternatives
-                diagnostics.append(f"• {path[2]} - Relax by {path[1]:.4f} (Profit: ${path[3]:.2f})")
-    
-    if 'combination_solutions' in locals() and combination_solutions:
-        diagnostics.append("")
-        diagnostics.append("BEST COMBINATION SOLUTION:")
-        best_combo = combination_solutions[0]
-        total_relax = sum(best_combo['relaxations'])
-        diagnostics.append(f"► Total relaxation: {total_relax:.4f}, Profit: ${best_combo['profit']:.2f}")
-        for constraint_key, relax_amount in zip(best_combo['constraints'], best_combo['relaxations']):
-            desc = constraint_details[constraint_key]
-            diagnostics.append(f"  - {desc}: relax by {relax_amount:.4f}")
+    except Exception as e:
+        diagnostics.append(f"Error during infeasibility analysis: {str(e)}")
+        diagnostics.append("This may indicate a deeper issue with the model setup.")
     
     return diagnostics
 
@@ -699,7 +445,7 @@ def run_optimization(grades_data, components_data, properties_list, specs_data, 
         try:
             solver = GLPK_CMD(msg=0, path=GLPSOL_PATH)
             model.solve(solver)
-        except FileNotFoundError as e:
+        except (pulp.PulpSolverError, FileNotFoundError) as e:
             solver_used = "CBC (Fallback)"
             model.solve(PULP_CBC_CMD(msg=0))
     else: 
@@ -746,8 +492,8 @@ def run_optimization(grades_data, components_data, properties_list, specs_data, 
     
     # Dictionary to store grade-specific results
     grade_results = {}
-    infeasibility_report = io.StringIO()
-    write_timestamp_header_to_stringio(infeasibility_report, "GRADE INFEASIBILITY ANALYSIS REPORT")
+    infeasibility_report_stringio = io.StringIO()
+    write_timestamp_header_to_stringio(infeasibility_report_stringio, "GRADE INFEASIBILITY ANALYSIS REPORT")
     has_infeasible_grades = False
     
     # If overall solution is infeasible, try to solve for each grade individually
@@ -806,7 +552,7 @@ def run_optimization(grades_data, components_data, properties_list, specs_data, 
                 'status': 'Optimal',
                 'model': model,
                 'blend': blend[current_grade],
-                'profit': 0  # Will be calculated later
+                'profit': 0
             }
     
     # Now display results for each grade
@@ -832,24 +578,19 @@ def run_optimization(grades_data, components_data, properties_list, specs_data, 
                 spec_bounds
             )
             
-            # Write summary to main report
             result1_content.write("See infeasibility_analysis.txt for detailed analysis\n\n")
             
-            # Write detailed analysis to infeasibility report
             has_infeasible_grades = True
             for diag in diagnostics:
-                infeasibility_report.write(diag + "\n")
-            infeasibility_report.write("\n" + "="*80 + "\n\n")
+                infeasibility_report_stringio.write(diag + "\n")
+            infeasibility_report_stringio.write("\n" + "="*80 + "\n\n")
             continue
         
-        # Show the blend details for optimal grades
         result1_content.write(f"\n=== Calculated Properties of '{current_grade}' Optimized Blend ===\n")
         
         if model.status == LpStatusOptimal:
-            # Use original model results
             current_blend = blend[current_grade]
         else:
-            # Use individual grade model results
             current_blend = grade_results[current_grade]['blend']
         
         current_total_volume = sum(current_blend[comp].varValue or 0 for comp in components)
@@ -906,7 +647,6 @@ def run_optimization(grades_data, components_data, properties_list, specs_data, 
         spec_row_content = ["SPEC", "", ""] 
         for p in display_properties_list:
             if p in ['ROI', 'MOI', 'RVI']:
-                # Get converted specs from spec_bounds
                 min_spec_val, max_spec_val = spec_bounds.get((p, current_grade), (0, float('inf')))
             else:
                 min_spec_val, max_spec_val = original_specs_data.get(p, {}).get(current_grade, {"min": 0, "max": float('inf')}).values()
@@ -940,10 +680,9 @@ def run_optimization(grades_data, components_data, properties_list, specs_data, 
         if model.status == LpStatusOptimal:
             total_used_volume = sum(blend[g][comp].varValue or 0 for g in grades)
         else:
-            # Sum across individual grade solutions
             total_used_volume = 0
             for g in grades:
-                if grade_results[g]['status'] == 'Optimal':
+                if grade_results[g]['status'] == 'Optimal' and grade_results[g]['blend'] is not None:
                     total_used_volume += grade_results[g]['blend'][comp].varValue or 0
         
         available_quantity = component_availability.get(comp, 0)
@@ -960,18 +699,18 @@ def run_optimization(grades_data, components_data, properties_list, specs_data, 
     result1_content.seek(0)
     
     range_report_content = io.StringIO()
-    write_timestamp_header_to_stringio(range_report_content, "GLPK RANGE ANALYSIS REPORT")
-
     if solver_choice == "GLPK" and model.status == LpStatusOptimal:
-        mod_file_path = MOD_FILE
-        dat_file_path = DAT_FILE
-        
-        # --- MathProg File Generation (corrected to match the code's data structure) ---
-        env = Environment(
-            loader=FileSystemLoader('.'),
-            undefined=StrictUndefined
-        )
-        mod_template = env.from_string("""
+        try:
+            mod_file_path = MOD_FILE
+            dat_file_path = DAT_FILE
+            
+            # --- MathProg File Generation ---
+            env = Environment(
+                loader=FileSystemLoader(BASE_PATH),
+                undefined=StrictUndefined
+            )
+            
+            mod_template_str = """
 set GRADES;
 set COMPONENTS;
 set PROPERTIES;
@@ -1017,9 +756,9 @@ s.t. Property_Max{p in PROPERTIES, g in GRADES}:
 solve;
 
 end;
-""")
+"""
 
-        dat_template = env.from_string("""
+            dat_template_str = """
 set GRADES := {% for g in grades %}{{ make_glpk_safe_name(g.name) }} {% endfor %};
 set COMPONENTS := {% for c in components %}{{ make_glpk_safe_name(c.name) }} {% endfor %};
 set PROPERTIES := {% for p in properties %}{{ p }} {% endfor %};
@@ -1042,50 +781,64 @@ param spec_max: {% for g in grades %}{{ make_glpk_safe_name(g.name) }} {% endfor
 {% for p in properties %} {{ p }} {% for g in grades %}{{ prepared_specs.get(p, {}).get(g.name, {}).get('max', 999999) }} {% endfor %}{% endfor %};
 
 end;
-""")
-        
-        # Prepare specs data for template (convert inf values to large numbers)
-        prepared_specs = prepare_specs_for_template(specs_data)
-        
-        # We need to pass the raw data structures to the Jinja templates.
-        grades_raw = grades_data
-        components_raw = components_data
-        properties_raw = properties_list
-        
-        mod_output = mod_template.render()
-        dat_output = dat_template.render(
-            grades=grades_raw, 
-            components=components_raw, 
-            properties=properties_raw, 
-            prepared_specs=prepared_specs,
-            make_glpk_safe_name=make_glpk_safe_name
-        )
+"""
+            
+            prepared_specs = prepare_specs_for_template(specs_data)
+            from jinja2 import Template
+            mod_template = Template(mod_template_str)
+            dat_template = Template(dat_template_str)
+            
+            grades_raw = grades_data
+            components_raw = components_data
+            properties_raw = properties_list
+            
+            mod_output = mod_template.render()
+            dat_output = dat_template.render(
+                grades=grades_raw, 
+                components=components_raw, 
+                properties=properties_raw, 
+                prepared_specs=prepared_specs,
+                make_glpk_safe_name=make_glpk_safe_name
+            )
 
-        with open(mod_file_path, "w") as f:
-            f.write(mod_output)
-        with open(dat_file_path, "w") as f:
-            f.write(dat_output)
-        
-        # --- End MathProg File Generation ---
-
-        glpsol_range_command = ["glpsol", "--math", mod_file_path, "--data", dat_file_path, "--ranges", "temp_range_output.txt"]
-        try:
-            subprocess.run(glpsol_range_command, capture_output=True, text=True, check=True)
-            with open("temp_range_output.txt", 'r', encoding='utf-8') as temp_f:
-                range_report_content.write(temp_f.read())
-        except (subprocess.CalledProcessError, FileNotFoundError, IOError):
-            range_report_content.write("GLPK Range Analysis is only available for GLPK solver with an Optimal solution.\n")
+            with open(mod_file_path, "w") as f:
+                f.write(mod_output)
+            with open(dat_file_path, "w") as f:
+                f.write(dat_output)
+            
+            # --- Run GLPK Range Analysis ---
+            range_output_file = os.path.join(BASE_PATH, "temp_range_output.txt")
+            glpsol_range_command = ["glpsol", "--math", mod_file_path, "--data", dat_file_path, "--ranges", range_output_file]
+            
+            result = subprocess.run(glpsol_range_command, capture_output=True, text=True, timeout=60)
+            
+            if result.returncode == 0 and os.path.exists(range_output_file):
+                write_timestamp_header_to_stringio(range_report_content, "GLPK RANGE ANALYSIS REPORT")
+                with open(range_output_file, 'r', encoding='utf-8') as temp_f:
+                    range_report_content.write(temp_f.read())
+            else:
+                range_report_content = io.StringIO()
+                write_timestamp_header_to_stringio(range_report_content, "GLPK RANGE ANALYSIS REPORT")
+                range_report_content.write("GLPK Range Analysis is only available for GLPK solver with an Optimal solution.\n")
+                
+        except Exception as e:
+            range_report_content = io.StringIO()
+            write_timestamp_header_to_stringio(range_report_content, "GLPK RANGE ANALYSIS REPORT")
+            range_report_content.write(f"Error during GLPK Range Analysis: {str(e)}\n")
+            range_report_content.write("Range analysis is only available for GLPK solver with an Optimal solution.\n")
     else:
+        range_report_content = io.StringIO()
+        write_timestamp_header_to_stringio(range_report_content, "GLPK RANGE ANALYSIS REPORT")
         range_report_content.write("GLPK Range Analysis is only available for GLPK solver with an Optimal solution.\n")
     
     range_report_content.seek(0)
     
     # Finalize infeasibility report
     if not has_infeasible_grades:
-        infeasibility_report.write("All grades were successfully optimized. No infeasibility issues found.\n")
-    infeasibility_report.seek(0)
+        infeasibility_report_stringio.write("All grades were successfully optimized. No infeasibility issues found.\n")
+    infeasibility_report_stringio.seek(0)
 
-    return result1_content.getvalue(), range_report_content.getvalue(), infeasibility_report.getvalue()
+    return result1_content.getvalue(), range_report_content.getvalue(), infeasibility_report_stringio.getvalue()
 
 # Main route handlers
 @app.route('/', methods=['GET'])
@@ -1142,112 +895,160 @@ def index():
 
 @app.route('/run_lp', methods=['POST'])
 def run_lp():
-    grades_data = []
-    for i, grade_name in enumerate(["Regular", "Premium", "Super Premium"]):
-        try:
-            min_val_str = request.form.get(f'grade_{grade_name}_min', '0').strip()
-            min_val = float(min_val_str) if min_val_str else 0.0
-            
-            max_val_str = request.form.get(f'grade_{grade_name}_max', '0').strip()
-            max_val = float(max_val_str) if max_val_str else 0.0
-            
-            price_val_str = request.form.get(f'grade_{grade_name}_price', '0').strip()
-            price_val = float(price_val_str) if price_val_str else 0.0
-            
-            grades_data.append({"name": grade_name, "min": min_val, "max": max_val, "price": price_val})
-        except ValueError:
-            return f"Invalid input for {grade_name} grade. Please enter numeric values.", 400
-
-    regular_gasoline_price = next((g['price'] for g in grades_data if g['name'] == 'Regular'), 100.00)
-    components_data = []
-    component_html_keys = ["C4B","IS1","RFL","F5X",
-                             "RCG","IC4","HBY","AKK","ETH"]
-    # Added the missing component display names
-    component_display_names = {
-        "C4B": "Alkyl Butane", "IS1": "Isomerate", "RFL": "Reformate",
-        "F5X": "Mixed RFC", "RCG": "FCC Gasoline", "IC4": "DIB IC4",
-        "HBY": "SHIP C4", "AKK": "Alkylate", "ETH": "Ethanol"
-        }
-    all_properties = ["SPG", "SUL", "RON", "MON", "RVP", "E70", "E10", "E15", "ARO", "BEN", "OXY", "OLEFIN"]
-
-    for comp_html_key in component_html_keys:
-        try:
-            # Use a more robust .get() method to prevent KeyError and default to the key itself
-            comp_tag = component_display_names.get(comp_html_key, comp_html_key)
-            
-            factor_str = request.form.get(f'component_{comp_html_key}_factor', '1.0').strip()
-            factor = float(factor_str) if factor_str else 1.0
-            calculated_cost = factor * regular_gasoline_price
-            
-            availability_str = request.form.get(f'component_{comp_html_key}_availability', '0').strip()
-            availability = float(availability_str) if availability_str else 0.0
-            
-            min_comp_str = request.form.get(f'component_{comp_html_key}_min_comp', '0.000000').strip()
-            min_comp = float(min_comp_str) if min_comp_str else 0.0
-            
-            comp_properties = {}
-            for prop in all_properties:
-                prop_val_str = request.form.get(f'component_{comp_html_key}_property_{prop}', '0.0').strip()
-                try:
-                    prop_val = float(prop_val_str or '0')
-                except ValueError:
-                    prop_val = 0.0
-                comp_properties[prop] = prop_val
-            components_data.append({
-                # Use the short key as the name for consistency
-                "name": comp_html_key,
-                "tag": comp_tag,
-                "cost": calculated_cost,
-                "availability": availability,
-                "min_comp": min_comp,
-                "factor": factor,
-                "properties": comp_properties
-            })
-        except ValueError as e:
-            return f"Invalid input for component {comp_tag}. Error: {e}", 400
-
-    specs_data = {}
-    for prop in all_properties:
-        specs_data[prop] = {}
-        for grade in grades_data:
+    try:
+        print("=== Starting LP Optimization ===")
+        
+        grades_data = []
+        for i, grade_name in enumerate(["Regular", "Premium", "Super Premium"]):
             try:
-                min_spec_str = request.form.get(f'spec_{prop}_{grade["name"]}_min', '0').strip()
-                max_spec_str = request.form.get(f'spec_{prop}_{grade["name"]}_max', 'inf').strip()
-                min_spec_val = float(min_spec_str) if min_spec_str and min_spec_str.lower() != 'inf' else 0.0
-                max_spec_val = float(max_spec_str) if max_spec_str and max_spec_str.lower() != 'inf' else float('inf')
-                specs_data[prop][grade['name']] = {"min": min_spec_val, "max": max_spec_val}
+                min_val_str = request.form.get(f'grade_{grade_name}_min', '0').strip()
+                min_val = float(min_val_str) if min_val_str else 0.0
+                
+                max_val_str = request.form.get(f'grade_{grade_name}_max', '0').strip()
+                max_val = float(max_val_str) if max_val_str else 0.0
+                
+                price_val_str = request.form.get(f'grade_{grade_name}_price', '0').strip()
+                price_val = float(price_val_str) if price_val_str else 0.0
+                
+                grades_data.append({"name": grade_name, "min": min_val, "max": max_val, "price": price_val})
+                print(f"Grade {grade_name}: min={min_val}, max={max_val}, price={price_val}")
             except ValueError as e:
-                return f"Invalid input for spec {prop} for {grade['name']}. Error: {e}", 400
+                error_msg = f"Invalid input for {grade_name} grade: {e}"
+                print(f"ERROR: {error_msg}")
+                return error_msg, 400
 
-    solver_choice = request.form.get('solver_choice', 'CBC')
+        regular_gasoline_price = next((g['price'] for g in grades_data if g['name'] == 'Regular'), 100.00)
+        components_data = []
+        component_html_keys = ["C4B","IS1","RFL","F5X","RCG","IC4","HBY","AKK","ETH"]
+        # Added the missing component display names
+        component_display_names = {
+            "C4B": "Alkyl Butane", "IS1": "Isomerate", "RFL": "Reformate",
+            "F5X": "Mixed RFC", "RCG": "FCC Gasoline", "IC4": "DIB IC4",
+            "HBY": "SHIP C4", "AKK": "Alkylate", "ETH": "Ethanol"
+        }
+        all_properties = ["SPG", "SUL", "RON", "MON", "RVP", "E70", "E10", "E15", "ARO", "BEN", "OXY", "OLEFIN"]
 
-    internal_properties_list = ["SPG", "SUL", "RON", "ROI", "MON", "MOI", "RVP", "RVI", "E70", "E10", "E15", "ARO", "BEN", "OXY", "OLEFIN"]
-    result1_content, result2_content, infeasibility_content = run_optimization(grades_data, components_data, internal_properties_list, specs_data, solver_choice)
+        for comp_html_key in component_html_keys:
+            try:
+                # Use a more robust .get() method to prevent KeyError and default to the key itself
+                comp_tag = component_display_names.get(comp_html_key, comp_html_key)
+                
+                factor_str = request.form.get(f'component_{comp_html_key}_factor', '1.0').strip()
+                factor = float(factor_str) if factor_str else 1.0
+                calculated_cost = factor * regular_gasoline_price
+                
+                availability_str = request.form.get(f'component_{comp_html_key}_availability', '0').strip()
+                availability = float(availability_str) if availability_str else 0.0
+                
+                min_comp_str = request.form.get(f'component_{comp_html_key}_min_comp', '0.000000').strip()
+                min_comp = float(min_comp_str) if min_comp_str else 0.0
+                
+                comp_properties = {}
+                for prop in all_properties:
+                    prop_val_str = request.form.get(f'component_{comp_html_key}_property_{prop}', '0.0').strip()
+                    try:
+                        prop_val = float(prop_val_str or '0')
+                    except ValueError:
+                        prop_val = 0.0
+                    comp_properties[prop] = prop_val
+                components_data.append({
+                    # Use the short key as the name for consistency
+                    "name": comp_html_key,
+                    "tag": comp_tag,
+                    "cost": calculated_cost,
+                    "availability": availability,
+                    "min_comp": min_comp,
+                    "factor": factor,
+                    "properties": comp_properties
+                })
+                print(f"Component {comp_html_key}: availability={availability}, cost={calculated_cost}")
+            except ValueError as e:
+                error_msg = f"Invalid input for component {comp_tag}: {e}"
+                print(f"ERROR: {error_msg}")
+                return error_msg, 400
 
-    with open(RESULT_FILE_NAME, "w", encoding="utf-8") as f1:
-        f1.write(result1_content)
-    with open(RANGE_REPORT_FILE_NAME, "w", encoding="utf-8") as f2:
-        f2.write(result2_content)
-    with open(INFEASIBILITY_FILE_NAME, "w", encoding="utf-8") as f3:
-        f3.write(infeasibility_content)
+        specs_data = {}
+        for prop in all_properties:
+            specs_data[prop] = {}
+            for grade in grades_data:
+                try:
+                    min_spec_str = request.form.get(f'spec_{prop}_{grade["name"]}_min', '0').strip()
+                    max_spec_str = request.form.get(f'spec_{prop}_{grade["name"]}_max', 'inf').strip()
+                    min_spec_val = float(min_spec_str) if min_spec_str and min_spec_str.lower() != 'inf' else 0.0
+                    max_spec_val = float(max_spec_str) if max_spec_str and max_spec_str.lower() != 'inf' else float('inf')
+                    specs_data[prop][grade['name']] = {"min": min_spec_val, "max": max_spec_val}
+                except ValueError as e:
+                    error_msg = f"Invalid input for spec {prop} for {grade['name']}: {e}"
+                    print(f"ERROR: {error_msg}")
+                    return error_msg, 400
 
-    return render_template('results.html', 
-                            result1_filename=RESULT_FILE_NAME, 
-                            result2_filename=RANGE_REPORT_FILE_NAME,
-                            infeasibility_filename=INFEASIBILITY_FILE_NAME)
+        solver_choice = request.form.get('solver_choice', 'CBC')
+        print(f"Using solver: {solver_choice}")
+
+        internal_properties_list = ["SPG", "SUL", "RON", "ROI", "MON", "MOI", "RVP", "RVI", "E70", "E10", "E15", "ARO", "BEN", "OXY", "OLEFIN"]
+        
+        print("Starting optimization...")
+        result1_content, result2_content, infeasibility_content = run_optimization(
+            grades_data, components_data, internal_properties_list, specs_data, solver_choice
+        )
+        print("Optimization completed successfully")
+
+        # Write results to files
+        print(f"Writing result files to {BASE_PATH}...")
+        with open(RESULT_FILE_NAME, "w", encoding="utf-8") as f1:
+            f1.write(result1_content)
+        with open(RANGE_REPORT_FILE_NAME, "w", encoding="utf-8") as f2:
+            f2.write(result2_content)
+        with open(INFEASIBILITY_FILE_NAME, "w", encoding="utf-8") as f3:
+            f3.write(infeasibility_content)
+        print("Files written successfully")
+
+        return render_template('results.html', 
+                                result1_filename=os.path.basename(RESULT_FILE_NAME), 
+                                result2_filename=os.path.basename(RANGE_REPORT_FILE_NAME),
+                                infeasibility_filename=os.path.basename(INFEASIBILITY_FILE_NAME))
+
+    except Exception as e:
+        print(f"🔥 CRITICAL ERROR in run_lp: {e}")
+        traceback.print_exc()
+        return f"INTERNAL ERROR: {str(e)}", 500
 
 @app.route('/download/<filename>')
 def download_file(filename):
-    if filename in [RESULT_FILE_NAME, RANGE_REPORT_FILE_NAME, INFEASIBILITY_FILE_NAME]:
-        return send_file(filename, as_attachment=True)
-    return "File not found.", 404
+    try:
+        # Only allow downloading files we created
+        allowed_files = [
+            os.path.basename(RESULT_FILE_NAME),
+            os.path.basename(RANGE_REPORT_FILE_NAME), 
+            os.path.basename(INFEASIBILITY_FILE_NAME)
+        ]
+        
+        if os.path.basename(filename) in allowed_files:
+            full_path = os.path.join(BASE_PATH, os.path.basename(filename))
+            if os.path.exists(full_path):
+                return send_file(full_path, as_attachment=True)
+            else:
+                print(f"File not found: {full_path}")
+                return "File not found.", 404
+        else:
+            print(f"Unauthorized file access attempt: {filename}")
+            return "Unauthorized file access.", 403
+            
+    except Exception as e:
+        print(f"Error in download_file: {e}")
+        return f"Download error: {str(e)}", 500
+
+# Health check endpoint for Render
+@app.route('/health')
+def health_check():
+    return {"status": "healthy", "timestamp": datetime.now().isoformat()}, 200
 
 # Main application entry point
-import os
-
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # 5000 for local, PORT from env for Render
-    app.run(host="0.0.0.0", port=port, debug=False)
+    port = int(os.environ.get("PORT", 5000))
+    print(f"Starting Flask app on port {port}")
+    app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
