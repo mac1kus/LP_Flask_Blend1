@@ -699,7 +699,7 @@ def run_optimization(grades_data, components_data, properties_list, specs_data, 
         try:
             solver = GLPK_CMD(msg=0, path=GLPSOL_PATH)
             model.solve(solver)
-        except (pulp.PulpSolverError, FileNotFoundError) as e:
+        except FileNotFoundError as e:
             solver_used = "CBC (Fallback)"
             model.solve(PULP_CBC_CMD(msg=0))
     else: 
@@ -1243,10 +1243,12 @@ def download_file(filename):
     return "File not found.", 404
 
 # Main application entry point
-if __name__ == '__main__':
-    import os
-    port = int(os.environ.get("PORT", 10000))
+import os
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))  # 5000 for local, PORT from env for Render
     app.run(host="0.0.0.0", port=port, debug=False)
+
 
 
             
