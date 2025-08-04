@@ -439,17 +439,54 @@ def run_optimization(grades_data, components_data, properties_list, specs_data, 
         for comp in components:
             model += blend[g][comp] >= 0, f"{g}_{comp}_NonNegative"
 
-solver_used = ""
-if solver_choice == "GLPK":
-    solver_used = "GLPK"
-    try:
-        solver = GLPK_CMD(msg=0)  # removed path=GLPSOL_PATH
-        model.solve(solver)
-    except FileNotFoundError as e:
-        solver_used = "CBC (Fallback)"
-        model.solve(PULP_CBC_CMD(msg=0))
-    else: 
-        solver_used = "CBC"
+    # === ENHANCED SOLVER SELECTION WITH BETTER GLPK HANDLING ===
+    print("=== SOLVER DEBUG INFO ===")
+    print(f"Selected solver: {solver_choice}")
+    
+    glpk_available = False
+    if GLPSOL_PATH:
+        try:
+            result = subprocess.run([GLPSOL_PATH, '--version'], capture_output=True, text=True, timeout=5)
+            if result.returncode == 0:
+                print(f"✅ GLPK found at specified path: {GLPSOL_PATH}")
+                glpk_available = True
+            else:
+                print(f"⚠️ GLPK at specified path failed: {result.stderr}")
+        except Exception as e:
+            print(f"⚠️ GLPK path check failed: {e}")
+    else:
+        try:
+            result = subprocess.run(['which', 'glpsol'], capture_output=True, text=True, timeout=5)
+            if result.returncode == 0:
+                print(f"✅ GLPK location: {result.stdout.strip()}")
+                glpk_available = True
+            else:
+                print("⚠️ GLPK not found in PATH")
+        except Exception as e:
+            print(f"⚠️ GLPK check failed: {e}")
+    
+    print("========================")
+    
+    solver_used = ""
+    if solver_choice == "GLPK" and glpk_available:
+        try:
+            print("🔄 Attempting to use GLPK solver...")
+            # Use GLPK_CMD without path if it's in the system's PATH
+            solver = GLPK_CMD(msg=0, path=GLPSOL_PATH)
+            model.solve(solver)
+            solver_used = "GLPK"
+            print("✅ Successfully used GLPK solver")
+        except Exception as e:
+            print(f"⚠️ GLPK failed ({e}), falling back to CBC")
+            model.solve(PULP_CBC_CMD(msg=0))
+            solver_used = "CBC (Fallback from GLPK)"
+    else:
+        if solver_choice == "GLPK" and not glpk_available:
+            print("⚠️ GLPK requested but not available, using CBC")
+            solver_used = "CBC (GLPK not available)"
+        else:
+            print("🔄 Using CBC solver")
+            solver_used = "CBC"
         model.solve(PULP_CBC_CMD(msg=0))
 
     result1_content = io.StringIO()
@@ -816,16 +853,20 @@ end;
                 write_timestamp_header_to_stringio(range_report_content, "GLPK RANGE ANALYSIS REPORT")
                 with open(range_output_file, 'r', encoding='utf-8') as temp_f:
                     range_report_content.write(temp_f.read())
+                os.remove(range_output_file) # Clean up temp file
             else:
                 range_report_content = io.StringIO()
                 write_timestamp_header_to_stringio(range_report_content, "GLPK RANGE ANALYSIS REPORT")
                 range_report_content.write("GLPK Range Analysis is only available for GLPK solver with an Optimal solution.\n")
+                if os.path.exists(range_output_file):
+                    os.remove(range_output_file) # Clean up failed temp file
                 
         except Exception as e:
             range_report_content = io.StringIO()
             write_timestamp_header_to_stringio(range_report_content, "GLPK RANGE ANALYSIS REPORT")
             range_report_content.write(f"Error during GLPK Range Analysis: {str(e)}\n")
             range_report_content.write("Range analysis is only available for GLPK solver with an Optimal solution.\n")
+            
     else:
         range_report_content = io.StringIO()
         write_timestamp_header_to_stringio(range_report_content, "GLPK RANGE ANALYSIS REPORT")
@@ -853,7 +894,7 @@ def index():
         {"name": "IS1", "tag": "Isomerate", "min_comp": 0.00, "availability": 1000000.000000, "factor": 1.250000, "cost": 125.000000, 
          "properties": {"SPG": 0.661000, "SUL": 0.500000, "RON": 88.560000, "MON": 86.150000, "RVP": 0.839000, "E70": 92.000000, "E10": 100.000000, "E15": 100.000000, "ARO": 0.000000, "BEN": 0.000000, "OXY": 0.000000, "OLEFIN": 0.000000}},
         {"name": "RFL", "tag": "Reformate", "min_comp": 0.00, "availability": 1000000.000000, "factor": 1.050000, "cost": 105.000000, 
-         "properties": {"SPG": 0.819000, "SUL": 0.000000, "RON": 97.000000, "MON": 86.150000, "RVP": 0.139000, "E70": 0.001000, "E10": 4.000000, "E15": 72.250000, "ARO": 61.800000, "BEN": 0.438400, "OXY": 0.000000, "OLEFIN": 0.775600}},
+         "properties": {"SPG": 0.819000, "SUL": 0.000000, "RON": 97.000000, "MON": 86.150000, "RVP": 0.139000, "E70": 0.001000, "E10": 4.000000, "E15": 67.300000, "ARO": 61.800000, "BEN": 0.438400, "OXY": 0.000000, "OLEFIN": 0.775600}},
         {"name": "F5X", "tag": "Mixed RFC", "min_comp": 0.00, "availability": 1000000.000000, "factor": 0.700000, "cost": 70.000000, 
          "properties": {"SPG": 0.644700, "SUL": 10.000000, "RON": 94.600000, "MON": 89.650000, "RVP": 1.310000, "E70": 100.000000, "E10": 100.000000, "E15": 100.000000, "ARO": 0.000000, "BEN": 1.160000, "OXY": 0.000000, "OLEFIN": 57.700000}},
         {"name": "RCG", "tag": "FCC Gasoline", "min_comp": 0, "availability": 1000000.000000, "factor": 0.900000, "cost": 90.000000, 
